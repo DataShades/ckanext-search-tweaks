@@ -1,0 +1,14 @@
+# search_tweaks-js:
+#   filter: rjsmin
+#   output: ckanext-search_tweaks/%(version)s-search_tweaks.js
+#   contents:
+#     - js/search_tweaks.js
+#   extra:
+#     preload:
+#       - base/main
+
+# search_tweaks-css:
+#   filter: cssrewrite
+#   output: ckanext-search_tweaks/%(version)s-search_tweaks.css
+#   contents:
+#     - css/search_tweaks.css
