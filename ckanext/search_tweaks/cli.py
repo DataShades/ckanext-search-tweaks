@@ -1,5 +1,6 @@
 import datetime
 import csv
+from ckan.lib.redis import connect_to_redis
 
 import click
 import freezegun
@@ -39,7 +40,7 @@ def import_source(source, date):
             score = QueryScore(pkg.id, row["search_query"])
             score.reset()
             score.increase(int(row["count_of_hits"]))
-
+    click.secho("Done", fg="green")
 
 @relevance.command()
 @click.argument("output", type=click.File("w"), required=False)
@@ -54,6 +55,7 @@ def export(output):
     else:
         for row in rows:
             click.echo("Id: %s, query: %s, count: %d" % row)
+    click.secho("Done", fg="green")
 
 
 @relevance.command()
@@ -64,3 +66,17 @@ def align():
     for (id_, query, _) in rows:
         score = QueryScore(id_, query)
         score.align()
+
+@relevance.command()
+@click.option("--days", "-d", type=int, default=1)
+@click.argument("file")
+@click.pass_context
+def safe_export(ctx, days, file):
+    conn = connect_to_redis()
+    uptime = conn.info()["uptime_in_days"]
+    if uptime >= days:
+        click.secho(f"Redis runs for {uptime} days. Creating snapshot..", fg="green")
+        ctx.invoke(export, output=click.File("w")(file))
+    else:
+        click.secho(f"Redis runs for {uptime} days. Restore stats from snapshot..", fg="red")
+        ctx.invoke(import_source, source=click.File()(file))
