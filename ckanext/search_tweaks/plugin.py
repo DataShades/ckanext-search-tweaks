@@ -9,7 +9,7 @@ CONFIG_BOOST_STRING = "ckanext.search_tweaks.relevance.boost_function"
 CONFIG_RELEVANCE_PREFIX = "ckanext.search_tweaks.relevance.field_prefix"
 
 DEFAULT_BOOST_STRING = "scale(def($field,0),0,2)"
-DEFAULT_RELEVANCE_PREFIX = "query_score_"
+DEFAULT_RELEVANCE_PREFIX = "query_relevance_"
 
 class SearchTweaksPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IClick)
@@ -20,7 +20,8 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
 
 class SearchTweaksRelevancePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurable)
-    plugins.implements(plugins.IPackageController)
+    plugins.implements(plugins.IPackageController, inherit=True)
+
     # IConfigurable
 
     def configure(self, config):
@@ -43,6 +44,7 @@ class SearchTweaksRelevancePlugin(plugins.SingletonPlugin):
             boost_string = Template(tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING))
             boost_function = boost_string.safe_substitute({"field": field})
             search_params['bf'] = f"sum({bf},{boost_function})"
+        return search_params
 
     def read(self, entity):
         # update search relevance only for WEB-requests. Any kind of

@@ -36,13 +36,17 @@ class QueryScore:
         if storage_class:
             self.storage_class = storage_class
         else:
-            self.storage_class = _backends[
-                tk.config.get(CONFIG_BACKEND, DEFAULT_BACKEND)
-            ]
+            self.storage_class = self.default_storage_class()
         self.storage = self.storage_class(id_, query)
 
     def __int__(self):
         return self.storage.get()
+
+    @staticmethod
+    def default_storage_class() -> Type[ScoreStorage]:
+        return _backends[
+            tk.config.get(CONFIG_BACKEND, DEFAULT_BACKEND)
+        ]
 
     @property
     def query(self):
@@ -59,8 +63,9 @@ class QueryScore:
 
     @classmethod
     def get_all(cls):
-        return cls.storage_class.scan()
+        storage = cls.default_storage_class()
+        return storage.scan()
 
     @classmethod
     def get_for(cls, id_: str):
-        return cls.storage_class.scan(id_)
+        return cls.default_storage_class().scan(id_)

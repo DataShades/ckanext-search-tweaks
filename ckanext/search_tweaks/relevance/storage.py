@@ -35,12 +35,14 @@ class ScoreStorage(ABC):
         """Replace current value with the given one."""
         ...
 
+    @classmethod
     @abstractclassmethod
-    def scan(cls, id_: Optional[str]) -> Iterable[ScanItem]:
+    def scan(cls, id_: Optional[str] = None) -> Iterable[ScanItem]:
         """Get all the scores.
         """
         ...
 
+    @classmethod
     @abstractclassmethod
     def reset_storage(cls):
         """Remove everything from storage.
