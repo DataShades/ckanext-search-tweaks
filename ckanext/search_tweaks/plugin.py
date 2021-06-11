@@ -38,7 +38,8 @@ class SearchTweaksRelevancePlugin(plugins.SingletonPlugin):
 
     def before_search(self, search_params):
         prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
-        if "q" in search_params:
+        disabled = tk.asbool(search_params.get('extras', {}).get("ext_search_tweaks_disable_relevance", False))
+        if "q" in search_params and not disabled:
             bf = search_params.get("bf") or "0"
             field = prefix + relevance.normalize_query(search_params["q"]).replace(" ", "_")
             boost_string = Template(tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING))
