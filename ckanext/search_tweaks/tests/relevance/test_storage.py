@@ -1,5 +1,5 @@
 import pytest
-from ckanext.search_tweaks.relevance.storage import (
+from ckanext.search_tweaks.visit_relevance.storage import (
     DailyRedisScoreStorage,
     PermanentRedisScoreStorage,
 )

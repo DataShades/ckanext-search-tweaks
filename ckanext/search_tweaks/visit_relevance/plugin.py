@@ -1,0 +1,55 @@
+from __future__ import annotations
+from string import Template
+from typing import Any, Optional
+
+import ckan.plugins as plugins
+import ckan.plugins.toolkit as tk
+
+from . import QueryScore, normalize_query, update_score_by_url
+
+from .. import cli
+from ..interfaces import ISearchBoost
+
+
+CONFIG_BOOST_STRING = "ckanext.search_tweaks.visit_relevance.boost_function"
+CONFIG_RELEVANCE_PREFIX = "ckanext.search_tweaks.visit_relevance.field_prefix"
+
+DEFAULT_BOOST_STRING = "scale(def($field,0),0,2)"
+DEFAULT_RELEVANCE_PREFIX = "query_relevance_"
+
+
+class VisitRelevancePlugin(plugins.SingletonPlugin):
+    plugins.implements(plugins.IConfigurable)
+    plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(ISearchBoost)
+
+    # iConfigurable
+
+    def configure(self, config):
+        cli.search_tweaks.add_command(cli.relevance)
+
+    # IPackageController
+
+    def before_index(self, pkg_dict):
+        prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
+        for (_, query, score) in QueryScore.get_for(pkg_dict["id"]):
+            query = query.replace(" ", "_")
+            pkg_dict[prefix + query] = score
+        return pkg_dict
+
+    def read(self, entity):
+        # update search relevance only for WEB-requests. Any kind of
+        # CLI/search-index manipulations has no effect on it
+        if tk.request and  tk.get_endpoint() == (entity.type, "read"):
+            update_score_by_url(entity)
+
+    # ISearchBoost
+
+    def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
+        prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
+        disabled = tk.asbool(search_params.get('extras', {}).get("ext_search_tweaks_disable_relevance", False))
+        if "q" not in search_params or disabled:
+            return None
+        field = prefix + normalize_query(search_params["q"]).replace(" ", "_")
+        boost_string = Template(tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING))
+        return  boost_string.safe_substitute({"field": field})

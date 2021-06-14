@@ -36,22 +36,22 @@ To install ckanext-search-tweaks:
 	# relevance for the particular search query. Possible values are:
 	# "redis-permanent", "redis-daily"
 	# (optional, default: redis-daily).
-	ckanext.search_tweaks.relevance.backend = redis-permanent
+	ckanext.search_tweaks.visit_relevance.backend = redis-permanent
 
 	# How long(in days) information about dataset visits will be stored in order to
 	# update relevance of dataset in search query.
 	# (optional, default: 90).
-	ckanext.search_tweaks.relevance.daily.age = 90
+	ckanext.search_tweaks.visit_relevance.daily.age = 90
 
 	# Solr boost function with $field placeholder that will be replaced by
 	# the correspoinding field name
 	# (optional, default: "scale(def($field,0),0,2)").
-	ckanext.search_tweaks.relevance.boost_function = recip($field,1,1000,1000)
+	ckanext.search_tweaks.visit_relevance.boost_function = recip($field,1,1000,1000)
 
 	# Prefix of the numeric field defined in Solr schema. This field will hold
 	# dataset's relevance for the given query.
 	# (optional, default: query_relevance_).
-	ckanext.search_tweaks.relevance.field_prefix = custom_score_
+	ckanext.search_tweaks.visit_relevance.field_prefix = custom_score_
 
 <!--
 <dynamicField name="query_relevance_*"  type="int" indexed="true" stored="true"/>

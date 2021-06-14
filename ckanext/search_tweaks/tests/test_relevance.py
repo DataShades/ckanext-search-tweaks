@@ -1,7 +1,7 @@
 import pytest
 
 import ckan.model as model
-import ckanext.search_tweaks.relevance as relevance
+import ckanext.search_tweaks.visit_relevance as relevance
 
 
 @pytest.mark.usefixtures("with_request_context")

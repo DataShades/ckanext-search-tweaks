@@ -6,7 +6,7 @@ import click
 import freezegun
 import ckan.model as model
 
-from ckanext.search_tweaks.relevance import QueryScore
+from ckanext.search_tweaks.visit_relevance import QueryScore
 
 def get_commands():
     return [search_tweaks]

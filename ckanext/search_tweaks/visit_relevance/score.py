@@ -7,7 +7,7 @@ _backends = {
     "redis-daily": DailyRedisScoreStorage,
 }
 
-CONFIG_BACKEND = "ckanext.search_tweaks.relevance.backend"
+CONFIG_BACKEND = "ckanext.search_tweaks.visit_relevance.backend"
 DEFAULT_BACKEND = "redis-daily"
 
 DEFAULT_SCORE_STORAGE_CLASS = DailyRedisScoreStorage
