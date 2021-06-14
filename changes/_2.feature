@@ -1,0 +1,1 @@
+Added `ISearchBoost` interface

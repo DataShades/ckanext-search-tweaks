@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.0.3',
+    version='0.1.0',
 
     description='''''',
     long_description=long_description,
@@ -88,6 +88,7 @@ setup(
         [ckan.plugins]
         search_tweaks=ckanext.search_tweaks.plugin:SearchTweaksPlugin
         search_tweaks_visit_relevance=ckanext.search_tweaks.visit_relevance.plugin:VisitRelevancePlugin
+        search_tweaks_field_relevance=ckanext.search_tweaks.field_relevance.plugin:FieldRelevancePlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

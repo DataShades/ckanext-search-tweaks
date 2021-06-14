@@ -15,6 +15,9 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def before_search(self, search_params):
+        if "defType" not in search_params:
+            search_params["defType"] = "edismax"
+
         bf = search_params.get("bf") or "0"
         for plugin in plugins.PluginImplementations(ISearchBoost):
             extra_bf = plugin.get_search_boost_fn(search_params)

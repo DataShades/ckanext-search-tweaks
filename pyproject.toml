@@ -1,2 +1,9 @@
 [black]
 line-length = 79
+[tool.towncrier]
+issue_format = ""
+directory = "changes"
+package = "ckanext.search_tweaks"
+package_dir = "ckanext"
+filename = "CHANGES.rst"
+name = "ckanext-search-tweaks"

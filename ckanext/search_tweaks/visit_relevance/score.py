@@ -12,7 +12,7 @@ DEFAULT_BACKEND = "redis-daily"
 
 DEFAULT_SCORE_STORAGE_CLASS = DailyRedisScoreStorage
 
-_space_translation = str.maketrans({char: " " for char in """'",-!?.:"""})
+_space_translation = str.maketrans({char: " " for char in """'",-!?.:*"""})
 
 
 def normalize_query(query: str) -> str:
