@@ -53,8 +53,39 @@ To install ckanext-search-tweaks:
 	# (optional, default: query_relevance_).
 	ckanext.search_tweaks.visit_relevance.field_prefix = custom_score_
 
+	# Solr boost function for static numeric field
+	# (optional, default: None).
+	ckanext.search_tweaks.field_relevance.boost_function = pow(promoted_level,2)
+
 <!--
 <dynamicField name="query_relevance_*"  type="int" indexed="true" stored="true"/>
+-->
+
+<!--
+
+// <requestHandler name="/select" class="solr.SearchHandler">
+
+=    <lst name="defaults">
+=      <str name="echoParams">explicit</str>
+=      <int name="rows">10</int>
++      <str name="spellcheck.count">10</str>
++      <str name="spellcheck.alternativeTermCount">5</str>
++      <str name="spellcheck.maxResultsForSuggest">5</str>
++      <str name="spellcheck.collate">true</str>
++      <str name="spellcheck.collateExtendedResults">true</str>
++      <str name="spellcheck.maxCollationTries">10</str>
++      <str name="spellcheck.maxCollations">5</str>
++      <str name="spellcheck.onlyMorePopular">on</str>
+=    </lst>
++    <arr name="last-components">
++      <str>spellcheck</str>
++    </arr>
+
+// <lst name="spellchecker">
+=      <str name="name">default</str>
+-      <str name="field">_text_</str>
++      <str name="field">text</str>
+
 -->
 
 ## Developer installation
