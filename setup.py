@@ -87,8 +87,9 @@ setup(
     entry_points='''
         [ckan.plugins]
         search_tweaks=ckanext.search_tweaks.plugin:SearchTweaksPlugin
-        search_tweaks_visit_relevance=ckanext.search_tweaks.visit_relevance.plugin:VisitRelevancePlugin
+        search_tweaks_query_relevance=ckanext.search_tweaks.query_relevance.plugin:QueryRelevancePlugin
         search_tweaks_field_relevance=ckanext.search_tweaks.field_relevance.plugin:FieldRelevancePlugin
+        search_tweaks_spellcheck=ckanext.search_tweaks.spellcheck.plugin:SpellcheckPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

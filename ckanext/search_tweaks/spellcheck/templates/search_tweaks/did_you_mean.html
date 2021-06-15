@@ -1,0 +1,11 @@
+{% with recommended = h.spellcheck_did_you_mean(g.q, min_hits=count) -%}
+    {% if recommended %}
+	<div class="search-tweaks--did-you-mean">
+	    {{ _("Did you mean") }}
+	    <a href="{{ h.remove_url_param("q", replace=recommended) }}">
+		{{ recommended }}
+	    </a>
+	</div>
+    {% endif %}
+
+{%- endwith %}

@@ -1,5 +1,5 @@
 import pytest
-from ckanext.search_tweaks.visit_relevance import QueryScore
+from ckanext.search_tweaks.query_relevance import QueryScore
 
 
 class TestQueryScore:

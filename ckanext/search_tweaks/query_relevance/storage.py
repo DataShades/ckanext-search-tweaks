@@ -7,7 +7,7 @@ from typing_extensions import TypeAlias
 import ckan.plugins.toolkit as tk
 from ckan.lib.redis import connect_to_redis, Redis
 
-CONFIG_DAILY_AGE = "ckanext.search_tweaks.visit_relevance.daily.age"
+CONFIG_DAILY_AGE = "ckanext.search_tweaks.query_relevance.daily.age"
 DEFAULT_DAILY_AGE = 90
 
 ScanItem: TypeAlias = "tuple[str, str, int]"

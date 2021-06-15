@@ -11,14 +11,14 @@ from .. import cli
 from ..interfaces import ISearchBoost
 
 
-CONFIG_BOOST_STRING = "ckanext.search_tweaks.visit_relevance.boost_function"
-CONFIG_RELEVANCE_PREFIX = "ckanext.search_tweaks.visit_relevance.field_prefix"
+CONFIG_BOOST_STRING = "ckanext.search_tweaks.query_relevance.boost_function"
+CONFIG_RELEVANCE_PREFIX = "ckanext.search_tweaks.query_relevance.field_prefix"
 
 DEFAULT_BOOST_STRING = "scale(def($field,0),0,2)"
 DEFAULT_RELEVANCE_PREFIX = "query_relevance_"
 
 
-class VisitRelevancePlugin(plugins.SingletonPlugin):
+class QueryRelevancePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(ISearchBoost)
