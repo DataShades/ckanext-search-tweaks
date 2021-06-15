@@ -1,3 +1,5 @@
+[![Tests](https://github.com/DataShades/ckanext-search-tweaks/workflows/Tests/badge.svg?branch=main)](https://github.com/DataShades/ckanext-search-tweaks/actions)
+
 # ckanext-search-tweaks
 
 Set of tools providing control over search results, sorting, etc.
