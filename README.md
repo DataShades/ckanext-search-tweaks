@@ -44,7 +44,7 @@ available. Bellow are listed all the plugins with their side effects.
 | [search_tweaks_field_relevance](#search_tweaks_field_relevance) | Promote dataset depending on value of it's field                                |
 | [search_tweaks_spellcheck](#search_tweaks_spellcheck)           | Provides "Did you mean?" feature                                                |
 
-### <a name="search_tweaks"></a> search_tweaks
+### <a id="search_tweaks"></a> search_tweaks
 
 Provides base functionality and essential pieces of logic used by all the other
 plugins. Must be enabled as long as at least one other plugin from this
@@ -67,7 +67,7 @@ following methods:
 
 ---
 
-### <a name="search_tweaks_query_relevance"></a> search_tweaks_query_relevance
+### <a id="search_tweaks_query_relevance"></a> search_tweaks_query_relevance
 
 #### Config settings
 
@@ -93,7 +93,7 @@ following methods:
 	ckanext.search_tweaks.query_relevance.field_prefix = custom_score_
 
 ---
-### <a name="search_tweaks_field_relevance"></a> search_tweaks_field_relevance
+### <a id="search_tweaks_field_relevance"></a> search_tweaks_field_relevance
 
 #### Config settings
 
@@ -103,7 +103,7 @@ following methods:
 
 ---
 
-### <a name="search_tweaks_spellcheck"></a> search_tweaks_spellcheck
+### <a id="search_tweaks_spellcheck"></a> search_tweaks_spellcheck
 
 Exposes search suggestions from the Solr's spellcheck component to CKAN
 templates. This plugin doesn't do much and mainly relies on the Solr's built-in
@@ -119,6 +119,13 @@ use it:
 			<str name="field">did_you_mean</str>
 			<str name="buildOnCommit">true</str>
 		</lst>
+
+- Add spellcheck component to the search handler (`<requestHandler
+  name="/select" class="solr.SearchHandler">`):
+
+		<arr name="last-components">
+			<str>spellcheck</str>
+		</arr>
 
 - Define spellcheck field in the schema. If you want to use an existing
   field(`text` for example), change `<str name="field">did_you_mean</str>`

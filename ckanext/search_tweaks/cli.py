@@ -22,7 +22,14 @@ def relevance():
 
 _search_csv_headers = ["package_id", "search_query", "count_of_hits"]
 
-@relevance.command("import")
+@click.group(short_help="Manage search relevance")
+def query():
+    pass
+
+# TODO: move to the plugin's update_config
+relevance.add_command(query)
+
+@query.command("import")
 @click.argument("source", type=click.File())
 @click.option("--date", type=datetime.date.fromisoformat)
 def import_source(source, date):
@@ -42,7 +49,7 @@ def import_source(source, date):
             score.increase(int(row["count_of_hits"]))
     click.secho("Done", fg="green")
 
-@relevance.command()
+@query.command()
 @click.argument("output", type=click.File("w"), required=False)
 def export(output):
     """Export search stats into specified file.
@@ -58,7 +65,7 @@ def export(output):
     click.secho("Done", fg="green")
 
 
-@relevance.command()
+@query.command()
 def align():
     """Remove old records.
     """
@@ -67,7 +74,7 @@ def align():
         score = QueryScore(id_, query)
         score.align()
 
-@relevance.command()
+@query.command()
 @click.option("--days", "-d", type=int, default=1)
 @click.argument("file")
 @click.pass_context
