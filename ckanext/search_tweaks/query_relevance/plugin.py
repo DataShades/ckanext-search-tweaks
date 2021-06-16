@@ -8,7 +8,7 @@ import ckan.plugins.toolkit as tk
 from . import QueryScore, normalize_query, update_score_by_url
 
 from .. import cli
-from ..interfaces import ISearchBoost
+from ..interfaces import ISearchTweaks
 
 
 CONFIG_BOOST_STRING = "ckanext.search_tweaks.query_relevance.boost_function"
@@ -21,7 +21,7 @@ DEFAULT_RELEVANCE_PREFIX = "query_relevance_"
 class QueryRelevancePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IPackageController, inherit=True)
-    plugins.implements(ISearchBoost)
+    plugins.implements(ISearchTweaks)
 
     # iConfigurable
 
@@ -43,7 +43,7 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
         if tk.request and  tk.get_endpoint() == (entity.type, "read"):
             update_score_by_url(entity)
 
-    # ISearchBoost
+    # ISearchTweaks
 
     def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
         prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)

@@ -53,11 +53,17 @@ plugins. Must be enabled as long as at least one other plugin from this
 extension is enabled.
 
 - Switches search to `edismax` query parser if none was specified
-- Enables `ckanext.search_tweaks.iterfaces.ISearchBoost` interface with the
+- Enables `ckanext.search_tweaks.iterfaces.ISearchTweaks` interface with the
 following methods:
 
 		def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
 			"""Returns optional boost function that will be applied to the search query.
+			"""
+			return None
+
+		def get_extra_qf(self, search_params: dict[str, Any]) -> Optional[str]:
+			"""Return an additional fragment of the Solr's qf.
+		    This fragment will be appended to the current qf
 			"""
 			return None
 
@@ -66,6 +72,13 @@ following methods:
 	ckan search-tweaks -
 		Root of all the extension specific commands.
 		Every command from minor plugins is registered under this section.
+
+
+#### Config settings
+
+	# Rewrite the default value of the qf parameter sent to Solr
+	# (optional, default: value of ckan.lib.search.query.QUERY_FIELDS).
+	ckanext.search_tweaks.common.qf = title^5 text
 
 ---
 
