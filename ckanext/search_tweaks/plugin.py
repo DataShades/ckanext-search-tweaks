@@ -13,7 +13,7 @@ from .interfaces import ISearchTweaks
 
 log = logging.getLogger(__name__)
 
-SearchParams = dict[str, Any]
+SearchParams = "dict[str, Any]"
 
 CONFIG_QF = "ckanext.search_tweaks.common.qf"
 CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
