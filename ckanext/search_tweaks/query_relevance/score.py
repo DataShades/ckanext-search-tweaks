@@ -16,7 +16,8 @@ _space_translation = str.maketrans({char: " " for char in """'",-!?.:*"""})
 
 
 def normalize_query(query: str) -> str:
-    return " ".join(query.strip().lower().translate(_space_translation).split())
+    clean = "".join(char if char.isalnum() or char.isspace() else " " for char in query.strip().lower())
+    return " ".join(clean.split())
 
 
 class QueryScore:
