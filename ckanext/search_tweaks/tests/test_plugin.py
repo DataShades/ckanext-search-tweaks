@@ -47,3 +47,48 @@ class TestPlugin:
     @pytest.mark.ckan_config(plugin.CONFIG_QF, "title^10 name^0.1")
     def test_qf_configured(self, search):
         assert search()["qf"] == "title^10 name^0.1"
+
+
+class TestFuzzy:
+    def test_fuzzy_disabled(self, search):
+        assert search()["q"] == "*:*"
+        assert search(q="hello")["q"] == "hello"
+        assert search(q="hello world")["q"] == "hello world"
+        assert search(q="hello:world")["q"] == "hello:world"
+        assert search(q="hello AND world")["q"] == "hello AND world"
+
+    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
+    @pytest.mark.parametrize("distance", [1, 2])
+    def test_fuzzy_enabled(self, search, distance, ckan_config, monkeypatch):
+        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
+        assert search()["q"] == "*:*"
+        assert search(q="hello")["q"] == f"hello~{distance}"
+        assert search(q="hello world")["q"] == f"hello~{distance} world~{distance}"
+        assert search(q="hello:world")["q"] == f"hello:world"
+        assert (
+            search(q="hello AND world")["q"] == f"hello~{distance} AND world~{distance}"
+        )
+
+    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
+    @pytest.mark.parametrize("distance", [-10, -1, 0])
+    def test_fuzzy_enabled_with_too_low_distance(
+        self, search, distance, ckan_config, monkeypatch
+    ):
+        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
+        assert search(q="")["q"] == "*:*"
+        assert search(q="hello")["q"] == "hello"
+        assert search(q="hello world")["q"] == "hello world"
+        assert search(q="hello:world")["q"] == "hello:world"
+        assert search(q="hello AND world")["q"] == "hello AND world"
+
+    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
+    @pytest.mark.parametrize("distance", [3, 20, 111])
+    def test_fuzzy_enabled_with_too_high_distance(
+        self, search, distance, ckan_config, monkeypatch
+    ):
+        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
+        assert search()["q"] == "*:*"
+        assert search(q="hello")["q"] == "hello~2"
+        assert search(q="hello world")["q"] == "hello~2 world~2"
+        assert search(q="hello:world")["q"] == "hello:world"
+        assert search(q="hello AND world")["q"] == "hello~2 AND world~2"

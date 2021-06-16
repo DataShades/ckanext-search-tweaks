@@ -69,12 +69,15 @@ def _set_qf(search_params: SearchParams):
 def _set_fuzzy(search_params: SearchParams):
     if not tk.asbool(tk.config.get(CONFIG_FUZZY, DEFAULT_FUZZY)):
         return
-    distance = tk.asbool(tk.config.get(CONFIG_FUZZY_DISTANCE, DEFAULT_FUZZY_DISTANCE))
+    distance = tk.asint(tk.config.get(CONFIG_FUZZY_DISTANCE, DEFAULT_FUZZY_DISTANCE))
     if distance < 0:
-        log.warning("Cannot use negative fuzzy distance: %s", distance);
+        log.warning("Cannot use negative fuzzy distance: %s.", distance)
         distance = 0
     elif distance > 2:
-        log.warning("Cannot use fuzzy distance greater than 2: %s", distance);
+        log.warning(
+            "Cannot use fuzzy distance greater than 2: %s. Reduce it to top boundary",
+            distance,
+        )
         distance = 2
 
     if not distance:
@@ -86,7 +89,7 @@ def _set_fuzzy(search_params: SearchParams):
     if not set(""":"'~""") & set(q):
         search_params["q"] = " ".join(
             map(
-                lambda s: s + "~2"
+                lambda s: f"{s}~{distance}"
                 if s.isalpha() and s not in ("AND", "OR", "TO")
                 else s,
                 q.split(),
