@@ -174,6 +174,12 @@ Now you can use `spellcheck_did_you_mean` helper that returns better search
 query when available instead of the current one. Consider including
 `search_tweaks/did_you_mean.html` fragment under search form.
 
+#### Config settings
+
+	# Display suggestions that have fewer results than current query
+	# (optional, default: false).
+	ckanext.search_tweaks.spellcheck.show_worse_suggestions = on
+
 ---
 
 

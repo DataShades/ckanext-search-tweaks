@@ -8,6 +8,9 @@ import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 
 CONFIG_EXTRA_PREFIX = "ckanext.search_tweaks.spellcheck.extra."
+CONFIG_SHOW_WORSE = "ckanext.search_tweaks.spellcheck.show_worse_suggestions"
+
+DEFAULT_SHOW_WORSE = False
 
 
 def better_collation(left, right):
@@ -34,14 +37,18 @@ def _get_spellcheck_params():
 
 
 def spellcheck_did_you_mean(q: str, min_hits: int = 0) -> Optional[str]:
+
     if not q:
         return
     spellcheck_params = _get_spellcheck_params()
     conn = make_connection(decode_dates=False)
     resp = conn.search(q=q, rows=0, **spellcheck_params)
     collations = resp.spellcheck.get("collations")
+
     if collations:
         best = reduce(better_collation, collations[1::2])
+        if tk.asbool(tk.config.get(CONFIG_SHOW_WORSE, DEFAULT_SHOW_WORSE)):
+            min_hits = 0
         if best["hits"] > min_hits:
             return best["collationQuery"]
 
