@@ -13,7 +13,7 @@ DEFAULT_BOOST_FN = None
 
 
 class FieldRelevancePlugin(p.SingletonPlugin):
-    p.implements(ISearchTweaks)
+    p.implements(ISearchTweaks, inherit=True)
 
     def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
         return tk.config.get(CONFIG_BOOST_FN, DEFAULT_BOOST_FN)

@@ -21,7 +21,7 @@ DEFAULT_RELEVANCE_PREFIX = "query_relevance_"
 class QueryRelevancePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurable)
     plugins.implements(plugins.IPackageController, inherit=True)
-    plugins.implements(ISearchTweaks)
+    plugins.implements(ISearchTweaks, inherit=True)
 
     # iConfigurable
 
