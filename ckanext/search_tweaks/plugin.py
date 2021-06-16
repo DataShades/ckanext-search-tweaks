@@ -35,8 +35,7 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
                 continue
             search_params["bf"] = f"sum({search_params['bf']},{extra_bf})"
 
-
-        default_qf = search_params.get("bf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
+        default_qf = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
         search_params.setdefault("qf", default_qf)
         for plugin in plugins.PluginImplementations(ISearchTweaks):
             extra_qf = plugin.get_extra_qf(search_params)

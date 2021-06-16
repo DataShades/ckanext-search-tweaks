@@ -12,6 +12,7 @@ DEFAULT_DAILY_AGE = 90
 
 ScanItem: TypeAlias = "tuple[str, str, int]"
 
+
 class ScoreStorage(ABC):
     id: str
     query: str
@@ -38,15 +39,13 @@ class ScoreStorage(ABC):
     @classmethod
     @abstractclassmethod
     def scan(cls, id_: Optional[str] = None) -> Iterable[ScanItem]:
-        """Get all the scores.
-        """
+        """Get all the scores."""
         ...
 
     @classmethod
     @abstractclassmethod
     def reset_storage(cls):
-        """Remove everything from storage.
-        """
+        """Remove everything from storage."""
         ...
 
     def reset(self) -> None:

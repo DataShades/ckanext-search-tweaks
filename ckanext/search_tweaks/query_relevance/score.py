@@ -16,7 +16,10 @@ _space_translation = str.maketrans({char: " " for char in """'",-!?.:*"""})
 
 
 def normalize_query(query: str) -> str:
-    clean = "".join(char if char.isalnum() or char.isspace() else " " for char in query.strip().lower())
+    clean = "".join(
+        char if char.isalnum() or char.isspace() else " "
+        for char in query.strip().lower()
+    )
     return " ".join(clean.split())
 
 
@@ -45,9 +48,7 @@ class QueryScore:
 
     @staticmethod
     def default_storage_class() -> Type[ScoreStorage]:
-        return _backends[
-            tk.config.get(CONFIG_BACKEND, DEFAULT_BACKEND)
-        ]
+        return _backends[tk.config.get(CONFIG_BACKEND, DEFAULT_BACKEND)]
 
     @property
     def query(self):

@@ -24,31 +24,38 @@ class TestStorages:
 
         s1 = storage("key", "query")
         s1.inc(10)
-        assert sorted(list(storage.scan())) == sorted([
-            ("key", "query", 10),
-        ])
+        assert sorted(list(storage.scan())) == sorted(
+            [
+                ("key", "query", 10),
+            ]
+        )
 
         s2 = storage("second key", "second query")
         s2.inc(5)
         s1.inc(90)
-        assert sorted(list(storage.scan())) == sorted([
-            ("key", "query", 100),
-            ("second key", "second query", 5),
-        ])
+        assert sorted(list(storage.scan())) == sorted(
+            [
+                ("key", "query", 100),
+                ("second key", "second query", 5),
+            ]
+        )
 
         s3 = storage("key", "extra query")
         s3.inc(1)
-        assert sorted(list(storage.scan())) == sorted([
-            ("key", "query", 100),
-            ("key", "extra query", 1),
-            ("second key", "second query", 5),
-        ])
+        assert sorted(list(storage.scan())) == sorted(
+            [
+                ("key", "query", 100),
+                ("key", "extra query", 1),
+                ("second key", "second query", 5),
+            ]
+        )
 
-        assert sorted(list(storage.scan("key"))) == sorted([
-            ("key", "query", 100),
-            ("key", "extra query", 1),
-        ])
-
+        assert sorted(list(storage.scan("key"))) == sorted(
+            [
+                ("key", "query", 100),
+                ("key", "extra query", 1),
+            ]
+        )
 
     def test_missing_key(self, storage):
         s = storage("not a real key", "not a real query")

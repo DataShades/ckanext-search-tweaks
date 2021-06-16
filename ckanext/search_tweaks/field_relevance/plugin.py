@@ -11,6 +11,7 @@ CONFIG_BOOST_FN = "ckanext.search_tweaks.field_relevance.boost_function"
 
 DEFAULT_BOOST_FN = None
 
+
 class FieldRelevancePlugin(p.SingletonPlugin):
     p.implements(ISearchTweaks)
 

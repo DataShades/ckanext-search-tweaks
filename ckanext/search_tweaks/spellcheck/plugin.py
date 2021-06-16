@@ -9,6 +9,7 @@ import ckan.plugins.toolkit as tk
 
 CONFIG_EXTRA_PREFIX = "ckanext.search_tweaks.spellcheck.extra."
 
+
 def better_collation(left, right):
     return max(left, right, key=itemgetter("hits"))
 
@@ -28,7 +29,7 @@ def _get_spellcheck_params():
     }
     for k in tk.config:
         if k.startswith(CONFIG_EXTRA_PREFIX):
-            default[k[len(CONFIG_EXTRA_PREFIX):]] = tk.config[k]
+            default[k[len(CONFIG_EXTRA_PREFIX) :]] = tk.config[k]
     return default
 
 
@@ -38,11 +39,11 @@ def spellcheck_did_you_mean(q: str, min_hits: int = 0) -> Optional[str]:
     spellcheck_params = _get_spellcheck_params()
     conn = make_connection(decode_dates=False)
     resp = conn.search(q=q, rows=0, **spellcheck_params)
-    collations = resp.spellcheck.get('collations')
+    collations = resp.spellcheck.get("collations")
     if collations:
         best = reduce(better_collation, collations[1::2])
         if best["hits"] > min_hits:
-            return best['collationQuery']
+            return best["collationQuery"]
 
 
 class SpellcheckPlugin(p.SingletonPlugin):

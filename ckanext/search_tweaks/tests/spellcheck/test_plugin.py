@@ -14,6 +14,7 @@ class TestSpellcheck:
     def test_plugin_loaded(self):
         assert p.plugin_loaded("search_tweaks_spellcheck")
 
+
 @pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins", "with_request_context")
 class TestDidYouMeanSnippet:
@@ -23,7 +24,7 @@ class TestDidYouMeanSnippet:
     def test_with_query(self, monkeypatch):
         expected = "hello"
         helper = mock.Mock(return_value=expected)
-        monkeypatch.setitem(tk.h, 'spellcheck_did_you_mean', helper)
+        monkeypatch.setitem(tk.h, "spellcheck_did_you_mean", helper)
         snippet = BeautifulSoup(tk.render("search_tweaks/did_you_mean.html"))
         helper.assert_called()
         link = snippet.select_one("a")
@@ -31,7 +32,7 @@ class TestDidYouMeanSnippet:
         assert "q=" + expected in link["href"]
 
 
-
+@pytest.mark.ckanext_search_tweaks_modified_schema
 @pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestHelper:

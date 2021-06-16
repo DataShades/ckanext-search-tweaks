@@ -40,19 +40,25 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
     def read(self, entity):
         # update search relevance only for WEB-requests. Any kind of
         # CLI/search-index manipulations has no effect on it
-        if tk.request and  tk.get_endpoint() == (entity.type, "read"):
+        if tk.request and tk.get_endpoint() == (entity.type, "read"):
             update_score_by_url(entity)
 
     # ISearchTweaks
 
     def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
         prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
-        disabled = tk.asbool(search_params.get('extras', {}).get("ext_search_tweaks_disable_relevance", False))
+        disabled = tk.asbool(
+            search_params.get("extras", {}).get(
+                "ext_search_tweaks_disable_relevance", False
+            )
+        )
         if not search_params.get("q") or disabled:
             return None
         normalized = normalize_query(search_params["q"]).replace(" ", "_")
         if not normalized:
             return None
         field = prefix + normalized
-        boost_string = Template(tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING))
-        return  boost_string.safe_substitute({"field": field})
+        boost_string = Template(
+            tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING)
+        )
+        return boost_string.safe_substitute({"field": field})

@@ -11,9 +11,8 @@ import ckan.model as model
 
 from .score import QueryScore, normalize_query
 
-__all__ = [
-    "QueryScore", "normalize_query", "update_score_by_url"
-]
+__all__ = ["QueryScore", "normalize_query", "update_score_by_url"]
+
 
 def update_score_by_url(pkg: model.Package, ref: Optional[str] = None) -> bool:
     ref = ref or tk.request.referrer
