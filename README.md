@@ -80,6 +80,14 @@ following methods:
 	# (optional, default: value of ckan.lib.search.query.QUERY_FIELDS).
 	ckanext.search_tweaks.common.qf = title^5 text
 
+	# Search by misspelled queries.
+	# (optional, default: false).
+	ckanext.search_tweaks.common.fuzzy_search.enabled = on
+
+	# Maximum number of misspelled letters. Possible values are 1 and 2.
+	# (optional, default: 1).
+	ckanext.search_tweaks.common.fuzzy_search.distance = 2
+
 ---
 
 ### <a id="search_tweaks_query_relevance"></a> search_tweaks_query_relevance

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import logging
+
 from typing import Any
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.search.query import QUERY_FIELDS
@@ -8,8 +11,17 @@ from ckan.lib.search.query import QUERY_FIELDS
 from . import cli
 from .interfaces import ISearchTweaks
 
+log = logging.getLogger(__name__)
+
+SearchParams = dict[str, Any]
+
 CONFIG_QF = "ckanext.search_tweaks.common.qf"
+CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
+CONFIG_FUZZY_DISTANCE = "ckanext.search_tweaks.common.fuzzy_search.distance"
+
 DEFAULT_QF = QUERY_FIELDS
+DEFAULT_FUZZY = False
+DEFAULT_FUZZY_DISTANCE = 1
 
 
 class SearchTweaksPlugin(plugins.SingletonPlugin):
@@ -23,24 +35,60 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
 
     # IPackageController
 
-    def before_search(self, search_params: dict[str, Any]):
+    def before_search(self, search_params: SearchParams):
         if "defType" not in search_params:
             search_params["defType"] = "edismax"
 
-        default_bf = search_params.get("bf") or "0"
-        search_params.setdefault("bf", default_bf)
-        for plugin in plugins.PluginImplementations(ISearchTweaks):
-            extra_bf = plugin.get_search_boost_fn(search_params)
-            if not extra_bf:
-                continue
-            search_params["bf"] = f"sum({search_params['bf']},{extra_bf})"
-
-        default_qf = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
-        search_params.setdefault("qf", default_qf)
-        for plugin in plugins.PluginImplementations(ISearchTweaks):
-            extra_qf = plugin.get_extra_qf(search_params)
-            if not extra_qf:
-                continue
-            search_params["qf"] += " " + extra_qf
+        _set_bf(search_params)
+        _set_qf(search_params)
+        _set_fuzzy(search_params)
 
         return search_params
+
+
+def _set_bf(search_params: SearchParams):
+    default_bf = search_params.get("bf") or "0"
+    search_params.setdefault("bf", default_bf)
+    for plugin in plugins.PluginImplementations(ISearchTweaks):
+        extra_bf = plugin.get_search_boost_fn(search_params)
+        if not extra_bf:
+            continue
+        search_params["bf"] = f"sum({search_params['bf']},{extra_bf})"
+
+
+def _set_qf(search_params: SearchParams):
+    default_qf = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
+    search_params.setdefault("qf", default_qf)
+    for plugin in plugins.PluginImplementations(ISearchTweaks):
+        extra_qf = plugin.get_extra_qf(search_params)
+        if not extra_qf:
+            continue
+        search_params["qf"] += " " + extra_qf
+
+
+def _set_fuzzy(search_params: SearchParams):
+    if not tk.asbool(tk.config.get(CONFIG_FUZZY, DEFAULT_FUZZY)):
+        return
+    distance = tk.asbool(tk.config.get(CONFIG_FUZZY_DISTANCE, DEFAULT_FUZZY_DISTANCE))
+    if distance < 0:
+        log.warning("Cannot use negative fuzzy distance: %s", distance);
+        distance = 0
+    elif distance > 2:
+        log.warning("Cannot use fuzzy distance greater than 2: %s", distance);
+        distance = 2
+
+    if not distance:
+        return
+
+    q = search_params.get("q")
+    if not q:
+        return
+    if not set(""":"'~""") & set(q):
+        search_params["q"] = " ".join(
+            map(
+                lambda s: s + "~2"
+                if s.isalpha() and s not in ("AND", "OR", "TO")
+                else s,
+                q.split(),
+            )
+        )
