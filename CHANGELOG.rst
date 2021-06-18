@@ -1,3 +1,18 @@
+ckanext-search-tweaks 0.1.7 (2021-06-18)
+========================================
+
+Features
+--------
+
+- Allow fuzzy-search ()
+
+
+Deprecations and Removals
+-------------------------
+
+- `show_worse_suggestions` -> `more_results_only` ()
+
+
 ckanext-search-tweaks 0.1.2 (2021-06-16)
 ========================================
 

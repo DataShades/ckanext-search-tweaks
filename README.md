@@ -176,9 +176,9 @@ query when available instead of the current one. Consider including
 
 #### Config settings
 
-	# Display suggestions that have fewer results than current query
-	# (optional, default: false).
-	ckanext.search_tweaks.spellcheck.show_worse_suggestions = on
+	# Do not show suggestions that have fewer results than current query
+	# (optional, default: true).
+	ckanext.search_tweaks.spellcheck.more_results_only = off
 
 ---
 
