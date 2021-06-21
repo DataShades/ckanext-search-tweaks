@@ -1,0 +1,95 @@
+{#
+config - configuration for advanced form. Use `advanced_search_form_config` helper as an example
+enable_advanced - enable advanced search
+enable_solr - enable Solr search
+prefix - prefix used for field names
+search_input - basic search field
+solr_input - Solr field
+search_button - basic search button
+#}
+
+{% asset "search_tweaks_advanced_search/advanced_search" %}
+
+{% set form_config = form_config|default(h.advanced_search_form_config())|tojson|forceescape %}
+{% set enable_solr = enable_solr|default(request.args.ext_solr_q | length > 0) %}
+{% set prefix = prefix|default(h.composite_search_get_prefix()) %}
+
+{% set ns = namespace(enable_advanced=false) %}
+{% for arg in request.args if arg.startswith(prefix) %}
+    {% set ns.enable_advanced = true %}
+{% endfor %}
+{% set enable_advanced = enable_advanced|default(ns.enable_advanced) %}
+
+
+{% set default_search_button %}
+<span class="input-group-btn">
+    <button class="btn btn-default btn-lg" type="submit" value="search" aria-label="{{_('Submit')}}">
+	<i class="fa fa-search"></i>
+    </button>
+</span>
+{% endset %}
+{% set search_button = search_button|default(default_search_button) %}
+
+{% set default_search_input %}
+<div class="input-group search-input-group">
+    <input type="text" class="form-control input-lg"
+	   name="q" value="{{ query }}" autocomplete="off"
+	   placeholder="{{ placeholder }}">
+    {{ search_button }}
+</div>
+{% endset %}
+{% set search_input = search_input|default(default_search_input) %}
+
+{% set default_solr_input %}
+<div class="input-group search-input-group">
+    <input type="text" class="form-control input-lg"
+	   value="{{ request.args.ext_solr_q }}" autocomplete="off"
+	   name="ext_solr_q" disabled
+	   placeholder="{{ _('metadata_created:[NOW/YEAR TO *] -tags:Health') }}" >
+    {{ search_button }}
+</div>
+{% endset %}
+{% set solr_input = solr_input|default(default_solr_input) %}
+
+
+<div class="search-tweaks-advanced-search"
+     data-module="search-tweaks-advanced-search"
+     {% if enable_advanced or enable_solr %} data-module-enable-advanced{% endif %}
+     {% if enable_solr %} data-module-enable-solr{% endif %}>
+
+    <div data-module="composite-search" class="advanced-search-widget"
+	 data-module-config="{{ form_config }}"
+	 data-module-prefix="{{ prefix }}"
+	 data-module-url-init
+	 {% if enable_advanced %} data-module-enabled{% endif %}>
+    </div>
+
+    <div class="original-search-widget">
+	{{ search_input }}
+
+    </div>
+    <div class="solr-search-widget">
+	{{ solr_input }}
+    </div>
+    <div class="advanced-search-submit">
+	{{ search_button }}
+    </div>
+
+    <div class="advanced-toggles">
+	<div class="toggle-item enable-advanced">
+	    <input id="toggle-enable-advanced" type="checkbox" autocomplete="off" {% if enable_advanced or enable_solr %} checked{% endif %}/>
+	    <label for="toggle-enable-advanced">{{ _('Advanced search') }}</label>
+	</div>
+	<div class="toggle-item enable-solr">
+	    <input id="toggle-enable-solr" type="checkbox"  autocomplete="off" {% if enable_solr %} checked{% endif %}/>
+	    <label for="toggle-enable-solr">
+		{{ _('Add query syntax to search') }}
+	    </label>
+	    <a target="_blank" href="https://solr.apache.org/guide/6_6/common-query-parameters.html">
+		<i class="fa fa-info-circle" data-placement="top" data-toggle="tooltip"
+		   title="{{ _('This adds SOLR query language, for more information on how to use click here') }}"></i>
+	    </a>
+	</div>
+    </div>
+
+</div>

@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.1.7',
+    version='0.2.0',
 
     description='''''',
     long_description=long_description,
@@ -66,7 +66,10 @@ setup(
         "freezegun",
         "typing_extensions",
     ],
-
+    python_requires=">=3.7",
+    extras_require={
+        "advanced-search": ["ckanext-composite-search>=0.1.0"]
+    },
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
@@ -90,6 +93,7 @@ setup(
         search_tweaks_query_relevance=ckanext.search_tweaks.query_relevance.plugin:QueryRelevancePlugin
         search_tweaks_field_relevance=ckanext.search_tweaks.field_relevance.plugin:FieldRelevancePlugin
         search_tweaks_spellcheck=ckanext.search_tweaks.spellcheck.plugin:SpellcheckPlugin
+        search_tweaks_advanced_search=ckanext.search_tweaks.advanced_search.plugin:AdvancedSearchPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

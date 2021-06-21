@@ -1,0 +1,30 @@
+.advanced-search-widget {
+  margin-bottom: 10px;
+}
+.original-search-widget {
+
+}
+.search-tweaks-advanced-search.enabled .original-search-widget {
+  display: none;
+}
+
+.solr-search-widget {
+  display: none;
+}
+.search-tweaks-advanced-search.enabled.use-solr-query .solr-search-widget {
+  display: block;
+}
+
+.advanced-search-submit {
+  display: none;
+}
+.search-tweaks-advanced-search.enabled .advanced-search-submit {
+  display: block;
+}
+.search-tweaks-advanced-search.enabled.use-solr-query .advanced-search-submit {
+  display: none;
+}
+
+.advanced-toggles label:after {
+  content: none;
+}

@@ -1,0 +1,15 @@
+composite_search_styles:
+  filter: cssrewrite
+  output: search_tweaks/%(version)s_search_tweaks_advanced_search.css
+  contents:
+    - advanced-search.css
+advanced_search:
+  filters: rjsmin
+  output: search_tweaks/%(version)s_search_tweaks_advanced_search.js
+  extra:
+    preload:
+      - base/main
+      - composite_search/composite_search
+      - search_tweaks_advanced_search/composite_search_styles
+  contents:
+    - advanced-search.js
