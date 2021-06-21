@@ -1,4 +1,6 @@
+from __future__ import annotations
 import json
+from typing import Any
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.exceptions import CkanConfigurationException
@@ -34,7 +36,7 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IConfigurable)
     p.implements(p.ITemplateHelpers)
-    p.implements(p.IMiddleware, inherit=True)
+    p.implements(p.IPackageController, inherit=True)
 
     # IConfigurer
 
@@ -61,3 +63,11 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
         return {
             "advanced_search_form_config": form_config,
         }
+
+    # IPackageController
+    def before_search(self, search_params: dict[str, Any]):
+        solr_q = search_params.get("extras", {}).get('ext_solr_q', None)
+        if solr_q:
+            search_params.setdefault("q", "")
+            search_params["q"] += " " + solr_q
+        return search_params
