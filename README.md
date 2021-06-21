@@ -45,6 +45,7 @@ available. Bellow are listed all the plugins with their side effects.
 | [search_tweaks_query_relevance](#search_tweaks_query_relevance) | Promote datasets that were visited most frequently for the current search query |
 | [search_tweaks_field_relevance](#search_tweaks_field_relevance) | Promote dataset depending on value of it's field                                |
 | [search_tweaks_spellcheck](#search_tweaks_spellcheck)           | Provides "Did you mean?" feature                                                |
+| [search_tweaks_advanced_search](#search_tweaks_advanced_search) | Basic configuration of ckanext-composite-search's search form                   |
 
 ### <a id="search_tweaks"></a> search_tweaks
 
@@ -91,6 +92,39 @@ following methods:
 ---
 
 ### <a id="search_tweaks_query_relevance"></a> search_tweaks_query_relevance
+
+Increase relevance of datasets for particular query depending on number of
+direct visits of the dataset after running this search. I.e, if user searches
+for `something` and then visits dataset **B** which is initially displayed in a
+third row of search results, eventually this dataset will be displayed on the
+second or even on the first row. This is implemented in three stages. On the
+first stage, statistics collected and stored inside storage(redis, by default)
+and then this statistics converted into numeric solr field via cronjob.
+Finally, Solr's boost function that scales number of visits and improves score
+for the given query is applied during search.
+
+Following steps are required in order to configure this plugin:
+
+- Add field that will store statistics to schema.xml(`query_relevance_` prefix
+  can be changed via config option):
+
+		<dynamicField name="query_relevance_*"  type="int" indexed="true" stored="true"/>
+
+- Configure a cronjob which will update search-index periodically:
+
+		0 0 * * * ckan search-index rebuild
+
+#### CLI
+
+	relevance query align - remove old data from storage. Actual result of this command depends
+		on storage backend, that is controlled by config. At the momment, only `redis-daily` backend
+		is affected by this command - all records older than `query_relevance.daily.age` days are removed.
+
+	relevance query export - export statistics as CSV.
+
+	relevance query import - import statistics from CSV. Note, records that are already in storage but
+		are not listed in CSV won't be removed. It must be done manually
+
 
 #### Config settings
 
@@ -181,11 +215,15 @@ query when available instead of the current one. Consider including
 	ckanext.search_tweaks.spellcheck.more_results_only = off
 
 ---
+### <a id="search_tweaks_advanced_search"></a> search_tweaks_advanced_search
 
+Configure `ckanext-composite-search` for the basic usage. One need
+`composite_search default_composite_search` plugins enabled in order to use
+this plugin. It registers `advanced_search/search_form.html` snippet which can
+be just used instead of `search_input` block of CKAN's
+`snippets/search_form.html`. It can take a number of parameters, check it's
+content for details.
 
-<!--
-<dynamicField name="query_relevance_*"  type="int" indexed="true" stored="true"/>
--->
 
 ## Developer installation
 
