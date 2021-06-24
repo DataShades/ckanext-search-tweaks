@@ -56,7 +56,7 @@ def spellcheck_did_you_mean(q: str, min_hits: int = 0) -> Optional[str]:
     if not collations and not only_better_options:
         suggestions = resp.spellcheck.get("suggestions", [])
         alternatives = dict(zip(suggestions[::2], [s["suggestion"][0] for s in suggestions[1::2]]))
-        new_q = ' '.join([alternatives[w] for w in query.split() if w in alternatives])
+        new_q = ' '.join([alternatives[w] for w in q.split() if w in alternatives])
         return new_q or None
 
     best = reduce(better_collation, collations[1::2])
