@@ -48,16 +48,22 @@ def rebuild_dictionary():
 def spellcheck_did_you_mean(q: str, min_hits: int = 0) -> Optional[str]:
     if not q:
         return
+    only_better_options = tk.asbool(tk.config.get(CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE))
     spellcheck_params = _get_spellcheck_params()
     conn = make_connection(decode_dates=False)
     resp = conn.search(q=q, rows=0, **spellcheck_params)
     collations = resp.spellcheck.get("collations")
-    if collations:
-        best = reduce(better_collation, collations[1::2])
-        if not tk.asbool(tk.config.get(CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE)):
-            min_hits = -1
-        if best["hits"] > min_hits:
-            return best["collationQuery"]
+    if not collations and not only_better_options:
+        suggestions = resp.spellcheck.get("suggestions", [])
+        alternatives = dict(zip(suggestions[::2], [s["suggestion"][0] for s in suggestions[1::2]]))
+        new_q = ' '.join([alternatives[w] for w in query.split() if w in alternatives])
+        return new_q or None
+
+    best = reduce(better_collation, collations[1::2])
+    if not only_better_options:
+        min_hits = -1
+    if best["hits"] > min_hits:
+        return best["collationQuery"]
 
 
 class SpellcheckPlugin(p.SingletonPlugin):
