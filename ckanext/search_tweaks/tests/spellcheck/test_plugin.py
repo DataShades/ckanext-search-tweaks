@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.tests.factories import Dataset
-from ckanext.search_tweaks.spellcheck.plugin import CONFIG_SHOW_ONLY_MORE
+from ckanext.search_tweaks.spellcheck.plugin import CONFIG_SHOW_ONLY_MORE, rebuild_dictionary
 
 @pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins")
@@ -41,21 +41,24 @@ class TestHelper:
         Dataset(notes="Pick this")
         Dataset(title="Do not touch me")
         helper = tk.h.spellcheck_did_you_mean
+        assert helper("pick thes") is None
+        assert helper("do nat touc me") is None
 
-        assert helper("pic thes") == "pick this"
+        rebuild_dictionary()
+        assert helper("pick thes") == "pick this"
         assert helper("do nat touc me") == "do not touch me"
 
-        assert helper("pic", 2) is None
+        assert helper("pic", 3) is None
         assert helper("pic", 1) == "pick"
 
     def test_show_only_more_results(self, ckan_config, monkeypatch):
         Dataset(title="Pick this")
         Dataset(notes="Pick this")
         Dataset(title="Pock this")
+        rebuild_dictionary()
         helper = tk.h.spellcheck_did_you_mean
-
         assert helper("pock", 1) == "pick"
-        assert helper("pick", 2) is None
+        assert helper("pick", 3) is None
 
         monkeypatch.setitem(ckan_config, CONFIG_SHOW_ONLY_MORE, "off")
         assert helper("pock", 1) == "pick"

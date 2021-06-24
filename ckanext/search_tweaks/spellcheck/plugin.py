@@ -6,6 +6,7 @@ from ckan.lib.search.common import make_connection
 
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
+from .. import cli
 
 CONFIG_EXTRA_PREFIX = "ckanext.search_tweaks.spellcheck.extra."
 CONFIG_SHOW_ONLY_MORE = "ckanext.search_tweaks.spellcheck.more_results_only"
@@ -36,26 +37,38 @@ def _get_spellcheck_params():
     return default
 
 
-def spellcheck_did_you_mean(q: str, min_hits: int = 0) -> Optional[str]:
+def rebuild_dictionary():
+    spellcheck_params = _get_spellcheck_params()
+    spellcheck_params["spellcheck.build"] = "true"
+    spellcheck_params["spellcheck.reload"] = "true"
+    conn = make_connection(decode_dates=False)
+    conn.search(q="", rows=0, **spellcheck_params)
 
+
+def spellcheck_did_you_mean(q: str, min_hits: int = 0) -> Optional[str]:
     if not q:
         return
     spellcheck_params = _get_spellcheck_params()
     conn = make_connection(decode_dates=False)
     resp = conn.search(q=q, rows=0, **spellcheck_params)
     collations = resp.spellcheck.get("collations")
-
     if collations:
         best = reduce(better_collation, collations[1::2])
         if not tk.asbool(tk.config.get(CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE)):
-            min_hits = 0
+            min_hits = -1
         if best["hits"] > min_hits:
             return best["collationQuery"]
 
 
 class SpellcheckPlugin(p.SingletonPlugin):
+    p.implements(p.IConfigurable)
     p.implements(p.IConfigurer)
     p.implements(p.ITemplateHelpers)
+
+    # IConfigurable
+
+    def configure(self, config):
+        cli.search_tweaks.add_command(cli.spellcheck)
 
     # IConfigurer
 

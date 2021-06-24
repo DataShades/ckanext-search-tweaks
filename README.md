@@ -214,6 +214,10 @@ query when available instead of the current one. Consider including
 	# (optional, default: true).
 	ckanext.search_tweaks.spellcheck.more_results_only = off
 
+#### CLI
+
+	spellcheck rebuild - rebuild/reload spellcheck dictionary.
+
 ---
 ### <a id="search_tweaks_advanced_search"></a> search_tweaks_advanced_search
 

@@ -1,3 +1,4 @@
+
 import datetime
 import csv
 from ckan.lib.redis import connect_to_redis
@@ -29,6 +30,16 @@ _search_csv_headers = ["package_id", "search_query", "count_of_hits"]
 @click.group(short_help="Manage search relevance")
 def query():
     pass
+
+@click.group(short_help="Manage search suggestions")
+def spellcheck():
+    pass
+
+
+@spellcheck.command("rebuild")
+def rebuild_suggestions():
+    from ckanext.search_tweaks.spellcheck.plugin import rebuild_dictionary
+    rebuild_dictionary()
 
 
 # TODO: move to the plugin's update_config
