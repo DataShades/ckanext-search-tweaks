@@ -65,6 +65,7 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
         }
 
     # IPackageController
+
     def before_search(self, search_params: dict[str, Any]):
         solr_q = search_params.get("extras", {}).get('ext_solr_q', None)
         if solr_q:
