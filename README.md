@@ -156,6 +156,15 @@ Following steps are required in order to configure this plugin:
 ---
 ### <a id="search_tweaks_field_relevance"></a> search_tweaks_field_relevance
 
+Increases the relevance of a dataset depending on value of its *numeric*
+field. For now it's impossible to promote dataset using field with textual type.
+
+No magic here either, this plugin allows you to specify Solr's boost function
+that will be used during all the searches. One can achieve exactly the same
+result using `ISearchTweaks.get_search_boost_fn`. But I expect this option to
+be used often, so there is a possibility to update relevance without any extra
+line of code.
+
 #### Config settings
 
 	# Solr boost function for static numeric field
@@ -171,17 +180,21 @@ templates. This plugin doesn't do much and mainly relies on the Solr's built-in
 functionality. Thus you have to make a lot of changes inside Solr in order to
 use it:
 
-- Configure spellcheck component. Search for `<searchComponent
+- `solrconfig.xml`. Configure spellcheck component. Search for `<searchComponent
   name="spellcheck" class="solr.SpellCheckComponent">` section and add the
   following item under it:
 
 		<lst name="spellchecker">
 			<str name="name">did_you_mean</str>
 			<str name="field">did_you_mean</str>
-			<str name="buildOnCommit">true</str>
+			<str name="buildOnCommit">false</str>
 		</lst>
 
-- Add spellcheck component to the search handler (`<requestHandler
+- Add cron job that will update suggestions dictionary periodically:
+
+		ckan search-tweaks spellcheck rebuild
+
+- `solrconfig.xml`. Add spellcheck component to the search handler (`<requestHandler
   name="/select" class="solr.SearchHandler">`):
 
 		<arr name="last-components">
@@ -190,7 +203,7 @@ use it:
 
 - Define spellcheck field in the schema. If you want to use an existing
   field(`text` for example), change `<str name="field">did_you_mean</str>`
-  value to the name of the selected field instead.
+  value inside `solrconfig.xml` to the name of the selected field instead.
 
 		<field name="did_you_mean" type="textgen" indexed="true" multiValued="true" />
 
@@ -208,8 +221,8 @@ After that you have to restart Solr service and rebuild search index:
 
 	ckan search-index rebuild
 
-Now you can use `spellcheck_did_you_mean` helper that returns better search
-query when available instead of the current one. Consider including
+Now you can use `spellcheck_did_you_mean` template helper that returns better
+search query when available instead of the current one. Consider including
 `search_tweaks/did_you_mean.html` fragment under search form.
 
 #### Config settings
