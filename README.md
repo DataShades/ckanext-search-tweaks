@@ -89,6 +89,10 @@ following methods:
 	# (optional, default: 1).
 	ckanext.search_tweaks.common.fuzzy_search.distance = 2
 
+	# Use `boost` instead of `bf` when `edismax` query parser is active
+	# (optional, default: false).
+	ckanext.search_tweaks.common.prefer_boost = yes
+
 ---
 
 ### <a id="search_tweaks_query_relevance"></a> search_tweaks_query_relevance

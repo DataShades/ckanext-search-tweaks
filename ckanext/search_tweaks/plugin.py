@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from typing import Any
-
+from typing import Any, Dict
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.search.query import QUERY_FIELDS
@@ -13,15 +12,17 @@ from .interfaces import ISearchTweaks
 
 log = logging.getLogger(__name__)
 
-SearchParams = "dict[str, Any]"
+SearchParams = Dict[str, Any]
 
 CONFIG_QF = "ckanext.search_tweaks.common.qf"
 CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
 CONFIG_FUZZY_DISTANCE = "ckanext.search_tweaks.common.fuzzy_search.distance"
+CONFIG_PREFER_BOOST = "ckanext.search_tweaks.common.prefer_boost"
 
 DEFAULT_QF = QUERY_FIELDS
 DEFAULT_FUZZY = False
 DEFAULT_FUZZY_DISTANCE = 1
+DEFAULT_PREFER_BOOST = False
 
 
 class SearchTweaksPlugin(plugins.SingletonPlugin):
@@ -38,12 +39,24 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
     def before_search(self, search_params: SearchParams):
         if "defType" not in search_params:
             search_params["defType"] = "edismax"
-
-        _set_bf(search_params)
+        prefer_boost = tk.asbool(tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST))
+        if prefer_boost and search_params["defType"] == "edismax":
+            _set_boost(search_params)
+        else:
+            _set_bf(search_params)
         _set_qf(search_params)
         _set_fuzzy(search_params)
 
         return search_params
+
+
+def _set_boost(search_params: SearchParams):
+    boost = search_params.setdefault("boost", [])
+    for plugin in plugins.PluginImplementations(ISearchTweaks):
+        extra = plugin.get_search_boost_fn(search_params)
+        if not extra:
+            continue
+        boost.append(extra)
 
 
 def _set_bf(search_params: SearchParams):
