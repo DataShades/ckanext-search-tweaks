@@ -242,7 +242,7 @@ Configure `ckanext-composite-search` for the basic usage. One need
 `composite_search default_composite_search` plugins enabled in order to use
 this plugin. It registers `advanced_search/search_form.html` snippet which can
 be just used instead of `search_input` block of CKAN's
-`snippets/search_form.html`. It can take a number of parameters, check it's
+`snippets/search_form.html`. It can take a number of parameters, check its
 content for details.
 
 
