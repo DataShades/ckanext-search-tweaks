@@ -32,9 +32,11 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
 
     def before_index(self, pkg_dict):
         prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
+
         for (_, query, score) in QueryScore.get_for(pkg_dict["id"]):
             query = query.replace(" ", "_")
             pkg_dict[prefix + query] = score
+
         return pkg_dict
 
     def read(self, entity):
@@ -52,13 +54,17 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
                 "ext_search_tweaks_disable_relevance", False
             )
         )
+
         if not search_params.get("q") or disabled:
             return None
+
         normalized = normalize_query(search_params["q"]).replace(" ", "_")
         if not normalized:
             return None
+
         field = prefix + normalized
         boost_string = Template(
             tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING)
         )
+
         return boost_string.safe_substitute({"field": field})

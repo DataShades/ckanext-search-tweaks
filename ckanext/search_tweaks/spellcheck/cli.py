@@ -1,5 +1,8 @@
 import click
 
+from . import rebuild_dictionary
+
+
 @click.group(short_help="Manage search suggestions")
 def spellcheck():
     pass
@@ -7,7 +10,5 @@ def spellcheck():
 
 @spellcheck.command("rebuild")
 def rebuild_suggestions():
-    from ckanext.search_tweaks.spellcheck.plugin import rebuild_dictionary
-
     rebuild_dictionary()
     click.secho("Done", fg="green")

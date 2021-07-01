@@ -40,8 +40,10 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
 
     def before_search(self, search_params: SearchParams):
         search_params.setdefault("mm", tk.config.get(CONFIG_MM, DEFAULT_MM))
+
         if "defType" not in search_params:
             search_params["defType"] = "edismax"
+
         prefer_boost = tk.asbool(
             tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST)
         )
@@ -50,14 +52,15 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
             _set_boost(search_params)
         else:
             _set_bf(search_params)
+
         _set_qf(search_params)
         _set_fuzzy(search_params)
 
         return search_params
 
 
-def _set_boost(search_params: SearchParams):
-    boost = search_params.setdefault("boost", [])
+def _set_boost(search_params: SearchParams) -> None:
+    boost: list[str] = search_params.setdefault("boost", [])
     for plugin in plugins.PluginImplementations(ISearchTweaks):
         extra = plugin.get_search_boost_fn(search_params)
         if not extra:
@@ -65,8 +68,8 @@ def _set_boost(search_params: SearchParams):
         boost.append(extra)
 
 
-def _set_bf(search_params: SearchParams):
-    default_bf = search_params.get("bf") or "0"
+def _set_bf(search_params: SearchParams) -> None:
+    default_bf: str = search_params.get("bf") or "0"
     search_params.setdefault("bf", default_bf)
     for plugin in plugins.PluginImplementations(ISearchTweaks):
         extra_bf = plugin.get_search_boost_fn(search_params)
@@ -75,8 +78,8 @@ def _set_bf(search_params: SearchParams):
         search_params["bf"] = f"sum({search_params['bf']},{extra_bf})"
 
 
-def _set_qf(search_params: SearchParams):
-    default_qf = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
+def _set_qf(search_params: SearchParams) -> None:
+    default_qf: str = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
     search_params.setdefault("qf", default_qf)
     for plugin in plugins.PluginImplementations(ISearchTweaks):
         extra_qf = plugin.get_extra_qf(search_params)
@@ -85,9 +88,32 @@ def _set_qf(search_params: SearchParams):
         search_params["qf"] += " " + extra_qf
 
 
-def _set_fuzzy(search_params: SearchParams):
+def _set_fuzzy(search_params: SearchParams) -> None:
     if not tk.asbool(tk.config.get(CONFIG_FUZZY, DEFAULT_FUZZY)):
         return
+
+    distance = _get_fuzzy_distance()
+    if not distance:
+        return
+
+    q = search_params.get("q")
+    if not q:
+        return
+
+    if set(""":"'~""") & set(q):
+        return
+
+    search_params["q"] = " ".join(
+        map(
+            lambda s: f"{s}~{distance}"
+            if s.isalpha() and s not in ("AND", "OR", "TO")
+            else s,
+            q.split(),
+        )
+    )
+
+
+def _get_fuzzy_distance() -> int:
     distance = tk.asint(tk.config.get(CONFIG_FUZZY_DISTANCE, DEFAULT_FUZZY_DISTANCE))
     if distance < 0:
         log.warning("Cannot use negative fuzzy distance: %s.", distance)
@@ -98,19 +124,4 @@ def _set_fuzzy(search_params: SearchParams):
             distance,
         )
         distance = 2
-
-    if not distance:
-        return
-
-    q = search_params.get("q")
-    if not q:
-        return
-    if not set(""":"'~""") & set(q):
-        search_params["q"] = " ".join(
-            map(
-                lambda s: f"{s}~{distance}"
-                if s.isalpha() and s not in ("AND", "OR", "TO")
-                else s,
-                q.split(),
-            )
-        )
+    return distance

@@ -15,9 +15,14 @@ __all__ = ["QueryScore", "normalize_query", "update_score_by_url"]
 
 
 def update_score_by_url(pkg: model.Package, ref: Optional[str] = None) -> bool:
-    ref = ref or tk.request.referrer
+    """Make given package more relevant for the current search query.
+    """
+    if tk.request:
+        ref = ref or tk.request.referrer
+
     if not ref:
         return False
+
     url = urlparse(ref)
     if not _path_has_score_for(url.path, pkg):
         return False

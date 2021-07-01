@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.tests.factories import Dataset
-from ckanext.search_tweaks.spellcheck.plugin import (
+from ckanext.search_tweaks.spellcheck import (
     CONFIG_SHOW_ONLY_MORE,
     rebuild_dictionary,
 )

@@ -1,6 +1,4 @@
-
 import click
-
 
 
 def get_commands():

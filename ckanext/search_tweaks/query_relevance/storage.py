@@ -1,8 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractclassmethod, abstractmethod
 from datetime import date, timedelta
-from typing import Any, Iterable, Optional, cast
-from typing_extensions import TypeAlias
+from typing import Any, Iterable, Optional, cast, Tuple
 
 import ckan.plugins.toolkit as tk
 from ckan.lib.redis import connect_to_redis, Redis
@@ -10,7 +9,7 @@ from ckan.lib.redis import connect_to_redis, Redis
 CONFIG_DAILY_AGE = "ckanext.search_tweaks.query_relevance.daily.age"
 DEFAULT_DAILY_AGE = 90
 
-ScanItem: TypeAlias = "tuple[str, str, int]"
+ScanItem = Tuple[str, str, int]
 
 
 class ScoreStorage(ABC):
@@ -90,6 +89,13 @@ class RedisScoreStorage(ScoreStorage):
 
 
 class PermanentRedisScoreStorage(RedisScoreStorage):
+    """Put all the points into the same cell.
+
+    Sparingly uses memory and must be prefered when there are no extra
+    requirements for invalidation of stats.
+
+    """
+
     def set(self, value: int) -> None:
         self.conn.hset(self._key(), self.query, value)
 
@@ -117,6 +123,13 @@ class PermanentRedisScoreStorage(RedisScoreStorage):
 
 
 class DailyRedisScoreStorage(RedisScoreStorage):
+    """Store data inside different cells depending on current date.
+
+    The longer index exists, the more memory it consumes. But it can be aligned
+    periodically in order to free memory.
+
+    """
+
     def set(self, value: int) -> None:
         key = self._key()
         zkey = self._zkey()
