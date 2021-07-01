@@ -6,7 +6,11 @@ from bs4 import BeautifulSoup
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.tests.factories import Dataset
-from ckanext.search_tweaks.spellcheck.plugin import CONFIG_SHOW_ONLY_MORE, rebuild_dictionary
+from ckanext.search_tweaks.spellcheck.plugin import (
+    CONFIG_SHOW_ONLY_MORE,
+    rebuild_dictionary,
+)
+
 
 @pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins")

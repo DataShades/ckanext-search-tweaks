@@ -26,6 +26,7 @@ DEFAULT_FUZZY_DISTANCE = 1
 DEFAULT_PREFER_BOOST = False
 DEFAULT_MM = "1"
 
+
 class SearchTweaksPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IClick)
     plugins.implements(plugins.IPackageController, inherit=True)
@@ -41,7 +42,9 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
         search_params.setdefault("mm", tk.config.get(CONFIG_MM, DEFAULT_MM))
         if "defType" not in search_params:
             search_params["defType"] = "edismax"
-        prefer_boost = tk.asbool(tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST))
+        prefer_boost = tk.asbool(
+            tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST)
+        )
 
         if prefer_boost and search_params["defType"] == "edismax":
             _set_boost(search_params)

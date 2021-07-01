@@ -7,9 +7,9 @@ import ckan.plugins.toolkit as tk
 
 from . import QueryScore, normalize_query, update_score_by_url
 
-from .. import cli
+from ..cli import attach_relevance_command
 from ..interfaces import ISearchTweaks
-
+from . import cli
 
 CONFIG_BOOST_STRING = "ckanext.search_tweaks.query_relevance.boost_function"
 CONFIG_RELEVANCE_PREFIX = "ckanext.search_tweaks.query_relevance.field_prefix"
@@ -23,10 +23,10 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(ISearchTweaks, inherit=True)
 
-    # iConfigurable
+    # IConfigurable
 
     def configure(self, config):
-        cli.search_tweaks.add_command(cli.relevance)
+        attach_relevance_command(cli.query)
 
     # IPackageController
 

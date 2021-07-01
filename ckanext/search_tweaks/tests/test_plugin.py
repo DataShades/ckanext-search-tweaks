@@ -1,4 +1,3 @@
-
 import pytest
 
 import ckan.plugins as p
@@ -7,13 +6,11 @@ import ckan.lib.search.query as query
 import ckanext.search_tweaks.plugin as plugin
 
 
-@pytest.mark.ckan_config("ckan.plugins", "search_tweaks")
 @pytest.mark.usefixtures("with_plugins")
 def test_plugin_loaded():
     assert p.plugin_loaded("search_tweaks")
 
 
-@pytest.mark.ckan_config("ckan.plugins", "search_tweaks")
 @pytest.mark.usefixtures("with_plugins")
 class TestPlugin:
     def test_deftype(self, search):
@@ -51,7 +48,6 @@ class TestPlugin:
         assert search()["qf"] == "title^10 name^0.1"
 
 
-@pytest.mark.ckan_config("ckan.plugins", "search_tweaks")
 @pytest.mark.usefixtures("with_plugins")
 class TestFuzzy:
     def test_fuzzy_disabled(self, search):

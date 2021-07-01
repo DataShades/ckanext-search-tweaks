@@ -6,7 +6,8 @@ from ckan.lib.search.common import make_connection
 
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
-from .. import cli
+from ..cli import attach_main_command
+from . import cli
 
 CONFIG_EXTRA_PREFIX = "ckanext.search_tweaks.spellcheck.extra."
 CONFIG_SHOW_ONLY_MORE = "ckanext.search_tweaks.spellcheck.more_results_only"
@@ -38,6 +39,10 @@ def _get_spellcheck_params():
 
 
 def rebuild_dictionary():
+    """Make sure our suggestions dictionary reflects current state of datasets.
+
+    I'm fast enough, but don't call me too often.
+    """
     spellcheck_params = _get_spellcheck_params()
     spellcheck_params["spellcheck.build"] = "true"
     spellcheck_params["spellcheck.reload"] = "true"
@@ -48,15 +53,19 @@ def rebuild_dictionary():
 def spellcheck_did_you_mean(q: str, min_hits: int = 0) -> Optional[str]:
     if not q:
         return
-    only_better_options = tk.asbool(tk.config.get(CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE))
+    only_better_options = tk.asbool(
+        tk.config.get(CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE)
+    )
     spellcheck_params = _get_spellcheck_params()
     conn = make_connection(decode_dates=False)
     resp = conn.search(q=q, rows=0, **spellcheck_params)
     collations = resp.spellcheck.get("collations")
     if not collations and not only_better_options:
         suggestions = resp.spellcheck.get("suggestions", [])
-        alternatives = dict(zip(suggestions[::2], [s["suggestion"][0] for s in suggestions[1::2]]))
-        new_q = ' '.join([alternatives[w] for w in q.split() if w in alternatives])
+        alternatives = dict(
+            zip(suggestions[::2], [s["suggestion"][0] for s in suggestions[1::2]])
+        )
+        new_q = " ".join([alternatives[w] for w in q.split() if w in alternatives])
         return new_q or None
 
     best = reduce(better_collation, collations[1::2])
@@ -74,7 +83,7 @@ class SpellcheckPlugin(p.SingletonPlugin):
     # IConfigurable
 
     def configure(self, config):
-        cli.search_tweaks.add_command(cli.spellcheck)
+        attach_main_command(cli.spellcheck)
 
     # IConfigurer
 

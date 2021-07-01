@@ -5,24 +5,45 @@ import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.exceptions import CkanConfigurationException
 
-CONFIG_FORM_DEFINITION = 'ckanext.search_tweaks.advanced_search.fields'
-CONFIG_FIELD_ORDER = 'ckanext.search_tweaks.advanced_search.order'
+CONFIG_FORM_DEFINITION = "ckanext.search_tweaks.advanced_search.fields"
+CONFIG_FIELD_ORDER = "ckanext.search_tweaks.advanced_search.order"
 
-DEFAULT_FORM_DEFINITION = json.dumps({
-    "text": { "type": "text", "label": "Any listed item", "placeholder": "Enter a search term", "default": True },
-    "title": { "type": "text", "label": "Title", "placeholder": "Enter a search term", },
-    "notes": { "type": "text", "label": "Description", "placeholder": "Enter a search term", },
-    "capacity": {
-	"type": "select",
-	"label": "Visibility",
-	"placeholder": 'Filter data by visibility',
-	"options": [{"value": "public", "label": "Public"},{"value": "private", "label": "Private"}],
-    },
-})
+DEFAULT_FORM_DEFINITION = json.dumps(
+    {
+        "text": {
+            "type": "text",
+            "label": "Any listed item",
+            "placeholder": "Enter a search term",
+            "default": True,
+        },
+        "title": {
+            "type": "text",
+            "label": "Title",
+            "placeholder": "Enter a search term",
+        },
+        "notes": {
+            "type": "text",
+            "label": "Description",
+            "placeholder": "Enter a search term",
+        },
+        "capacity": {
+            "type": "select",
+            "label": "Visibility",
+            "placeholder": "Filter data by visibility",
+            "options": [
+                {"value": "public", "label": "Public"},
+                {"value": "private", "label": "Private"},
+            ],
+        },
+    }
+)
 DEFAULT_FIELD_ORDER = None
 
+
 def form_config():
-    definition = json.loads(tk.config.get(CONFIG_FORM_DEFINITION, DEFAULT_FORM_DEFINITION))
+    definition = json.loads(
+        tk.config.get(CONFIG_FORM_DEFINITION, DEFAULT_FORM_DEFINITION)
+    )
     order = tk.aslist(tk.config.get(CONFIG_FIELD_ORDER, DEFAULT_FIELD_ORDER))
     if not order:
         order = list(definition)
@@ -50,12 +71,18 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
         try:
             from ckanext.composite_search.interfaces import ICompositeSearch
         except ImportError:
-            raise CkanConfigurationException('ckanext-composite-search is not installed')
-        if not p.plugin_loaded('composite_search'):
-            raise CkanConfigurationException('`composite_search` plugin must be enabled in order to use advanced search')
+            raise CkanConfigurationException(
+                "ckanext-composite-search is not installed"
+            )
+        if not p.plugin_loaded("composite_search"):
+            raise CkanConfigurationException(
+                "`composite_search` plugin must be enabled in order to use advanced search"
+            )
         if not list(p.PluginImplementations(ICompositeSearch)):
-            raise CkanConfigurationException('Advanced search requires plugin that implements ICompositeSearch.' +
-                                             ' Consider enabling `default_composite_search` plugins.')
+            raise CkanConfigurationException(
+                "Advanced search requires plugin that implements ICompositeSearch."
+                + " Consider enabling `default_composite_search` plugins."
+            )
 
     # ITemplateHelpers
 
@@ -67,7 +94,7 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
     # IPackageController
 
     def before_search(self, search_params: dict[str, Any]):
-        solr_q = search_params.get("extras", {}).get('ext_solr_q', None)
+        solr_q = search_params.get("extras", {}).get("ext_solr_q", None)
         if solr_q:
             search_params.setdefault("q", "")
             search_params["q"] += " " + solr_q
