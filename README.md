@@ -93,6 +93,11 @@ following methods:
 	# (optional, default: false).
 	ckanext.search_tweaks.common.prefer_boost = yes
 
+	# MinimumShouldMatch used in queries
+	# (optional, default: 1).
+	ckanext.search_tweaks.common.mm = 2<-1 5<80%
+
+
 ---
 
 ### <a id="search_tweaks_query_relevance"></a> search_tweaks_query_relevance

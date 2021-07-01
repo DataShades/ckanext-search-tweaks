@@ -18,12 +18,13 @@ CONFIG_QF = "ckanext.search_tweaks.common.qf"
 CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
 CONFIG_FUZZY_DISTANCE = "ckanext.search_tweaks.common.fuzzy_search.distance"
 CONFIG_PREFER_BOOST = "ckanext.search_tweaks.common.prefer_boost"
+CONFIG_MM = "ckanext.search_tweaks.common.mm"
 
 DEFAULT_QF = QUERY_FIELDS
 DEFAULT_FUZZY = False
 DEFAULT_FUZZY_DISTANCE = 1
 DEFAULT_PREFER_BOOST = False
-
+DEFAULT_MM = "1"
 
 class SearchTweaksPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IClick)
@@ -37,9 +38,11 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def before_search(self, search_params: SearchParams):
+        search_params.setdefault("mm", tk.config.get(CONFIG_MM, DEFAULT_MM))
         if "defType" not in search_params:
             search_params["defType"] = "edismax"
         prefer_boost = tk.asbool(tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST))
+
         if prefer_boost and search_params["defType"] == "edismax":
             _set_boost(search_params)
         else:
