@@ -45,7 +45,9 @@ available. Bellow are listed all the plugins with their side effects.
 | [search_tweaks_query_relevance](#search_tweaks_query_relevance) | Promote datasets that were visited most frequently for the current search query |
 | [search_tweaks_field_relevance](#search_tweaks_field_relevance) | Promote dataset depending on value of it's field                                |
 | [search_tweaks_spellcheck](#search_tweaks_spellcheck)           | Provides "Did you mean?" feature                                                |
+<!--
 | [search_tweaks_advanced_search](#search_tweaks_advanced_search) | Basic configuration of ckanext-composite-search's search form                   |
+-->
 
 ### <a id="search_tweaks"></a> search_tweaks
 
@@ -236,11 +238,16 @@ search query when available instead of the current one. Consider including
 	# (optional, default: true).
 	ckanext.search_tweaks.spellcheck.more_results_only = off
 
+	# How many different suggestions you expect to see for query
+	# (optional, default: 1).
+	ckanext.search_tweaks.spellcheck.max_suggestions = 3
+
 #### CLI
 
 	spellcheck rebuild - rebuild/reload spellcheck dictionary.
 
 ---
+<!--
 ### <a id="search_tweaks_advanced_search"></a> search_tweaks_advanced_search
 
 Configure `ckanext-composite-search` for the basic usage. One need
@@ -249,7 +256,7 @@ this plugin. It registers `advanced_search/search_form.html` snippet which can
 be just used instead of `search_input` block of CKAN's
 `snippets/search_form.html`. It can take a number of parameters, check its
 content for details.
-
+-->
 
 ## Developer installation
 

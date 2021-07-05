@@ -1,10 +1,22 @@
+
+{% macro search_link(query) -%}
+    <a href="{{ h.remove_url_param("q", replace=query) }}">{{ query }}</a>
+{%- endmacro %}
+
 {% with recommended = h.spellcheck_did_you_mean(g.q, min_hits=count) -%}
     {% if recommended %}
 	<div class="search-tweaks--did-you-mean">
 	    {{ _("Did you mean") }}
-	    <a href="{{ h.remove_url_param("q", replace=recommended) }}">
-		{{ recommended }}
-	    </a>
+
+	    {% set separator = joiner(", ") %}
+	    {% for option in recommended[:-1] -%}
+		{{ separator() }}{{ search_link(option) }}
+	    {%- endfor %}
+	    {% if recommended|length > 1 %}
+		{{ _('or') }}
+	    {% endif %}
+
+	    {{ search_link(recommended[-1]) }}
 	</div>
     {% endif %}
 

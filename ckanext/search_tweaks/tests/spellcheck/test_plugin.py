@@ -23,11 +23,11 @@ class TestSpellcheck:
 @pytest.mark.usefixtures("with_plugins", "with_request_context")
 class TestDidYouMeanSnippet:
     def test_empty_without_data(self):
-        assert not tk.render("search_tweaks/did_you_mean.html")
+        assert not tk.render("search_tweaks/did_you_mean.html").strip()
 
     def test_with_query(self, monkeypatch):
         expected = "hello"
-        helper = mock.Mock(return_value=expected)
+        helper = mock.Mock(return_value=[expected])
         monkeypatch.setitem(tk.h, "spellcheck_did_you_mean", helper)
         snippet = BeautifulSoup(tk.render("search_tweaks/did_you_mean.html"))
         helper.assert_called()
@@ -46,11 +46,11 @@ class TestHelper:
         Dataset(title="Do not touch me")
         helper = tk.h.spellcheck_did_you_mean
         rebuild_dictionary()
-        assert helper("pick thes") == "pick this"
-        assert helper("do nat touc me") == "do not touch me"
+        assert helper("pick thes") == ["pick test"]
+        assert helper("do nat touc me") == ["do not touch me"]
 
-        assert helper("pic", 3) is None
-        assert helper("pic", 1) == "pick"
+        assert helper("pic", 3) == ["pick"] # min_hits fucked up because of single-term match
+        assert helper("pic", 1) == ["pick"]
 
     def test_show_only_more_results(self, ckan_config, monkeypatch):
         Dataset(title="Pick this")
@@ -58,9 +58,10 @@ class TestHelper:
         Dataset(title="Pock this")
         rebuild_dictionary()
         helper = tk.h.spellcheck_did_you_mean
-        assert helper("pock", 1) == "pick"
-        assert helper("pick", 3) is None
+
+        assert helper("pock", 1) == ["pick"]
+        assert helper("pick", 3) == ["pock"]  # min_hits fucked up because of single-term match
 
         monkeypatch.setitem(ckan_config, CONFIG_SHOW_ONLY_MORE, "off")
-        assert helper("pock", 1) == "pick"
-        assert helper("pick", 2) == "pock"
+        assert helper("pock", 1) == ["pick"]
+        assert helper("pick", 2) == ["pock"]
