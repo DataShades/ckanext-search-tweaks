@@ -9,12 +9,13 @@ from . import QueryScore, normalize_query, update_score_by_url
 
 from ..cli import attach_relevance_command
 from ..interfaces import ISearchTweaks
+from .. import feature_disabled
 from . import cli
 
 CONFIG_BOOST_STRING = "ckanext.search_tweaks.query_relevance.boost_function"
 CONFIG_RELEVANCE_PREFIX = "ckanext.search_tweaks.query_relevance.field_prefix"
 
-DEFAULT_BOOST_STRING = "scale(def($field,0),0,2)"
+DEFAULT_BOOST_STRING = "scale(def($field,0),1,1.2)"
 DEFAULT_RELEVANCE_PREFIX = "query_relevance_"
 
 
@@ -48,6 +49,9 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
     # ISearchTweaks
 
     def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
+        if feature_disabled("query_boost", search_params):
+            return
+
         prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
         disabled = tk.asbool(
             search_params.get("extras", {}).get(
@@ -56,11 +60,11 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
         )
 
         if not search_params.get("q") or disabled:
-            return None
+            return
 
         normalized = normalize_query(search_params["q"]).replace(" ", "_")
         if not normalized:
-            return None
+            return
 
         field = prefix + normalized
         boost_string = Template(

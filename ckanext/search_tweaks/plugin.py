@@ -7,7 +7,7 @@ import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.search.query import QUERY_FIELDS
 
-from . import cli
+from . import cli, boost_preffered, feature_disabled
 from .interfaces import ISearchTweaks
 
 log = logging.getLogger(__name__)
@@ -17,13 +17,11 @@ SearchParams = Dict[str, Any]
 CONFIG_QF = "ckanext.search_tweaks.common.qf"
 CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
 CONFIG_FUZZY_DISTANCE = "ckanext.search_tweaks.common.fuzzy_search.distance"
-CONFIG_PREFER_BOOST = "ckanext.search_tweaks.common.prefer_boost"
 CONFIG_MM = "ckanext.search_tweaks.common.mm"
 
 DEFAULT_QF = QUERY_FIELDS
 DEFAULT_FUZZY = False
 DEFAULT_FUZZY_DISTANCE = 1
-DEFAULT_PREFER_BOOST = False
 DEFAULT_MM = "1"
 
 
@@ -39,16 +37,15 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def before_search(self, search_params: SearchParams):
+        if feature_disabled("everything", search_params):
+            return search_params
+
         search_params.setdefault("mm", tk.config.get(CONFIG_MM, DEFAULT_MM))
 
         if "defType" not in search_params:
             search_params["defType"] = "edismax"
 
-        prefer_boost = tk.asbool(
-            tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST)
-        )
-
-        if prefer_boost and search_params["defType"] == "edismax":
+        if boost_preffered() and search_params["defType"] == "edismax":
             _set_boost(search_params)
         else:
             _set_bf(search_params)
@@ -79,6 +76,9 @@ def _set_bf(search_params: SearchParams) -> None:
 
 
 def _set_qf(search_params: SearchParams) -> None:
+    if feature_disabled("qf", search_params):
+        return
+
     default_qf: str = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
     search_params.setdefault("qf", default_qf)
     for plugin in plugins.PluginImplementations(ISearchTweaks):
@@ -90,6 +90,9 @@ def _set_qf(search_params: SearchParams) -> None:
 
 def _set_fuzzy(search_params: SearchParams) -> None:
     if not tk.asbool(tk.config.get(CONFIG_FUZZY, DEFAULT_FUZZY)):
+        return
+
+    if feature_disabled("fuzzy", search_params):
         return
 
     distance = _get_fuzzy_distance()

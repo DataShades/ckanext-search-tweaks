@@ -92,8 +92,8 @@ following methods:
 	ckanext.search_tweaks.common.fuzzy_search.distance = 2
 
 	# Use `boost` instead of `bf` when `edismax` query parser is active
-	# (optional, default: false).
-	ckanext.search_tweaks.common.prefer_boost = yes
+	# (optional, default: true).
+	ckanext.search_tweaks.common.prefer_boost = no
 
 	# MinimumShouldMatch used in queries
 	# (optional, default: 1).
@@ -152,7 +152,7 @@ Following steps are required in order to configure this plugin:
 
 	# Solr boost function with $field placeholder that will be replaced by
 	# the correspoinding field name
-	# (optional, default: "scale(def($field,0),0,2)").
+	# (optional, default: "scale(def($field,0),1,1.2)").
 	ckanext.search_tweaks.query_relevance.boost_function = recip($field,1,1000,1000)
 
 	# Prefix of the numeric field defined in Solr schema. This field will hold

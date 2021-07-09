@@ -9,10 +9,13 @@ from ckan.lib.search.common import make_connection
 from . import get_spellcheck_params, CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE
 
 CONFIG_MAX_SUGGESTIONS = "ckanext.search_tweaks.spellcheck.max_suggestions"
-CONFIG_SUGGESTION_FOR_SINGLE = "ckanext.search_tweaks.spellcheck.single_term_prefer_suggestion"
+CONFIG_SUGGESTION_FOR_SINGLE = (
+    "ckanext.search_tweaks.spellcheck.single_term_prefer_suggestion"
+)
 
 DEFAULT_MAX_SUGGESTIONS = 1
 DEFAULT_SUGGESTION_FOR_SINGLE = True
+
 
 def get_helpers():
     return {
@@ -20,7 +23,9 @@ def get_helpers():
     }
 
 
-def spellcheck_did_you_mean(q: str, min_hits: int = 0, max_suggestions: int = None) -> list[str]:
+def spellcheck_did_you_mean(
+    q: str, min_hits: int = 0, max_suggestions: int = None
+) -> list[str]:
     """Return optimal query that can be used instead of the current one.
 
     Suggested query is guaranteed to have at least `min_hits` matching
@@ -41,7 +46,9 @@ def spellcheck_did_you_mean(q: str, min_hits: int = 0, max_suggestions: int = No
         min_hits = -1
 
     if not max_suggestions:
-        max_suggestions = tk.asint(tk.config.get(CONFIG_MAX_SUGGESTIONS, DEFAULT_MAX_SUGGESTIONS))
+        max_suggestions = tk.asint(
+            tk.config.get(CONFIG_MAX_SUGGESTIONS, DEFAULT_MAX_SUGGESTIONS)
+        )
 
     use_suggestion_for_single = tk.asbool(
         tk.config.get(CONFIG_SUGGESTION_FOR_SINGLE, DEFAULT_SUGGESTION_FOR_SINGLE)
@@ -51,7 +58,9 @@ def spellcheck_did_you_mean(q: str, min_hits: int = 0, max_suggestions: int = No
         # TODO: check min hits
         return spellcheck.suggestions.get(terms[0], [])[:max_suggestions]
 
-    collations = [str(c) for c in spellcheck.best_collations(max_suggestions) if min_hits < c]
+    collations = [
+        str(c) for c in spellcheck.best_collations(max_suggestions) if min_hits < c
+    ]
 
     if len(collations) < max_suggestions:
         # this is a bit tricky part. We are collecting brand new query from the
@@ -60,11 +69,12 @@ def spellcheck_did_you_mean(q: str, min_hits: int = 0, max_suggestions: int = No
         # the human's point of view, but Solr will gladely accept it.
 
         # TODO: check min hits
-        new_q = " ".join([spellcheck.suggestions[w][0] for w in terms if w in spellcheck.suggestions])
+        new_q = " ".join(
+            [spellcheck.suggestions[w][0] for w in terms if w in spellcheck.suggestions]
+        )
         collations.append(new_q)
 
     return collations
-
 
 
 def _do_spellcheck(q):
@@ -127,4 +137,4 @@ class SpellcheckResult:
         )
 
     def best_collations(self, n: Optional[int] = None) -> list[Collation]:
-        return  sorted(self.collations)[:n]
+        return sorted(self.collations)[:n]

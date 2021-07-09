@@ -49,7 +49,9 @@ class TestHelper:
         assert helper("pick thes") == ["pick test"]
         assert helper("do nat touc me") == ["do not touch me"]
 
-        assert helper("pic", 3) == ["pick"] # min_hits fucked up because of single-term match
+        assert helper("pic", 3) == [
+            "pick"
+        ]  # min_hits fucked up because of single-term match
         assert helper("pic", 1) == ["pick"]
 
     def test_show_only_more_results(self, ckan_config, monkeypatch):
@@ -60,7 +62,9 @@ class TestHelper:
         helper = tk.h.spellcheck_did_you_mean
 
         assert helper("pock", 1) == ["pick"]
-        assert helper("pick", 3) == ["pock"]  # min_hits fucked up because of single-term match
+        assert helper("pick", 3) == [
+            "pock"
+        ]  # min_hits fucked up because of single-term match
 
         monkeypatch.setitem(ckan_config, CONFIG_SHOW_ONLY_MORE, "off")
         assert helper("pock", 1) == ["pick"]

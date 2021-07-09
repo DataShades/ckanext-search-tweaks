@@ -13,7 +13,6 @@ DEFAULT_BACKEND = "redis-daily"
 DEFAULT_SCORE_STORAGE_CLASS = DailyRedisScoreStorage
 
 
-
 def normalize_query(query: str) -> str:
     clean = "".join(
         char if char.isalnum() or char.isspace() else " "
