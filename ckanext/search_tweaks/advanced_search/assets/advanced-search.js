@@ -1,7 +1,6 @@
 ckan.module("search-tweaks-advanced-search", function ($) {
   "use strict";
   var EVENT_TOGGLE_SEARCH = "composite-search:toggle";
-  console.log("mpodule");
   return {
     options: {
       enableAdvanced: false,
@@ -38,7 +37,6 @@ ckan.module("search-tweaks-advanced-search", function ($) {
       this.$('[type="submit"]').first().click();
     },
     _onEnableAdvanced: function (e) {
-      console.log(e.target.checked);
       if (e.target.checked) {
         this.enableAdvanced();
       } else {
