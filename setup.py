@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.3.1',
+    version='0.3.2',
 
     description='''''',
     long_description=long_description,
@@ -68,7 +68,7 @@ setup(
     ],
     python_requires=">=3.7",
     extras_require={
-        "advanced-search": ["ckanext-composite-search~=0.1.3"]
+        "advanced-search": []
     },
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
