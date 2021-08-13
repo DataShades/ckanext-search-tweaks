@@ -1,0 +1,7 @@
+field_relevance:
+  output: search_tweaks/%(version)s_search_tweaks_field_relevance.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - search-tweaks-reflect-range-in-label.js
