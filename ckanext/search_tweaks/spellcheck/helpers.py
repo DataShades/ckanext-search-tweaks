@@ -107,14 +107,14 @@ class Collation:
             return self.hits == other
         return self.hits == other.hits and self.query == other.query
 
-    def __gt__(self, other):
+    def __lt__(self, other):
         if isinstance(other, int):
-            return self.hits > other
+            return self.hits < other
 
         if self.hits == other.hits:
-            return self.query > other.query
+            return self.query < other.query
 
-        return self.hits > other.hits
+        return self.hits < other.hits
 
     def __str__(self):
         return self.query
@@ -137,4 +137,4 @@ class SpellcheckResult:
         )
 
     def best_collations(self, n: Optional[int] = None) -> list[Collation]:
-        return sorted(self.collations)[:n]
+        return sorted(self.collations, reverse=True)[:n]
