@@ -72,7 +72,8 @@ def spellcheck_did_you_mean(
         new_q = " ".join(
             [spellcheck.suggestions[w][0] for w in terms if w in spellcheck.suggestions]
         )
-        collations.append(new_q)
+        if new_q:
+            collations.append(new_q)
 
     return collations
 

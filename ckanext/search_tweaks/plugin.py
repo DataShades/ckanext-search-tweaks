@@ -18,11 +18,13 @@ CONFIG_QF = "ckanext.search_tweaks.common.qf"
 CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
 CONFIG_FUZZY_DISTANCE = "ckanext.search_tweaks.common.fuzzy_search.distance"
 CONFIG_MM = "ckanext.search_tweaks.common.mm"
+CONFIG_FUZZY_KEEP_ORIGINAL = "ckanext.search_tweaks.common.fuzzy_search.keep_original"
 
 DEFAULT_QF = QUERY_FIELDS
 DEFAULT_FUZZY = False
 DEFAULT_FUZZY_DISTANCE = 1
 DEFAULT_MM = "1"
+DEFAULT_FUZZY_KEEP_ORIGINAL = True
 
 
 class SearchTweaksPlugin(plugins.SingletonPlugin):
@@ -106,7 +108,7 @@ def _set_fuzzy(search_params: SearchParams) -> None:
     if set(""":"'~""") & set(q):
         return
 
-    search_params["q"] = " ".join(
+    fuzzy_q = " ".join(
         map(
             lambda s: f"{s}~{distance}"
             if s.isalpha() and s not in ("AND", "OR", "TO")
@@ -114,6 +116,10 @@ def _set_fuzzy(search_params: SearchParams) -> None:
             q.split(),
         )
     )
+    if tk.asbool(tk.config.get(CONFIG_FUZZY_KEEP_ORIGINAL, DEFAULT_FUZZY_KEEP_ORIGINAL)):
+        search_params['q'] = f"({fuzzy_q}) OR ({q})"
+    else:
+        search_params['q'] = fuzzy_q
 
 
 def _get_fuzzy_distance() -> int:
