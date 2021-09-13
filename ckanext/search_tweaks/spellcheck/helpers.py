@@ -36,6 +36,7 @@ def spellcheck_did_you_mean(
     """
     if not q:
         return []
+    q = q.lower()
 
     spellcheck = _do_spellcheck(q)
 
