@@ -1,6 +1,6 @@
 
 {% macro search_link(query) -%}
-    <a href="{{ h.remove_url_param("q", replace=query) }}">{{ query }}</a>
+    <a href="{{ h.remove_url_param("q", replace=query, extras=request.view_args) }}">{{ query }}</a>
 {%- endmacro %}
 
 
