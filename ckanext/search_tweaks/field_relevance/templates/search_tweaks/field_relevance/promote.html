@@ -1,6 +1,5 @@
 {% extends "package/edit_base.html" %}
 
-
 {% block styles %}
     {{ super() }}
     <style>
@@ -16,6 +15,7 @@
     {% asset "search_tweaks_field_relevance/field_relevance" %}
     {% block form %}
 	<form id="dataset-edit" class="dataset-form" method="post" action="{{ action }}" data-module="basic-form" novalidate>
+
 	    {% call form.input_block(field_name, _("Promotion level"), errors[field_name], classes=["search-tweaks-label-with-value"]) %}
 		<input data-module="search-tweaks-reflect-range-in-label" data-module-format=" (%d)" id="{{ field_name }}" type="range" name="{{ field_name }}" value="{{ data[field_name] }}" max="{{ max_promotion }}" />
 	    {% endcall %}

@@ -29,7 +29,9 @@ class TestPathHasScore:
     def test_organization_referrer(self, path, has_score, monkeypatch):
         pkg = model.Package(type="dataset")
         monkeypatch.setattr(
-            model.Group, "get", lambda _: model.Group(name="valid", type="organization")
+            model.Group,
+            "get",
+            lambda _: model.Group(name="valid", type="organization"),
         )
         assert relevance._path_has_score_for(path, pkg) is has_score
 
@@ -43,7 +45,9 @@ class TestPathHasScore:
     )
     def test_group_referrer(self, path, has_score, monkeypatch):
         pkg = model.Package(type="dataset")
-        monkeypatch.setattr(model.Group, "get", lambda _: model.Group(name="valid"))
+        monkeypatch.setattr(
+            model.Group, "get", lambda _: model.Group(name="valid")
+        )
         assert relevance._path_has_score_for(path, pkg) is has_score
 
 

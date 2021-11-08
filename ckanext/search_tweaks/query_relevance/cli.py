@@ -29,7 +29,9 @@ def import_source(source, date):
         for row in reader:
             pkg = model.Package.get(row["package_id"])
             if not pkg:
-                click.secho(f"Package {row['package_id']} does not exists", fg="red")
+                click.secho(
+                    f"Package {row['package_id']} does not exists", fg="red"
+                )
                 continue
             score = QueryScore(pkg.id, row["search_query"])
             score.reset()
@@ -78,10 +80,13 @@ def safe_export(ctx, days, file):
     conn = connect_to_redis()
     uptime = conn.info()["uptime_in_days"]
     if uptime >= days:
-        click.secho(f"Redis runs for {uptime} days. Creating snapshot..", fg="green")
+        click.secho(
+            f"Redis runs for {uptime} days. Creating snapshot..", fg="green"
+        )
         ctx.invoke(export, output=click.File("w")(file))
     else:
         click.secho(
-            f"Redis runs for {uptime} days. Restore stats from snapshot..", fg="red"
+            f"Redis runs for {uptime} days. Restore stats from snapshot..",
+            fg="red",
         )
         ctx.invoke(import_source, source=click.File()(file))

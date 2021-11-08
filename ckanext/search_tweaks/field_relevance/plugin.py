@@ -16,16 +16,18 @@ DEFAULT_BOOST_FN = None
 
 class FieldRelevancePlugin(p.SingletonPlugin):
     p.implements(ISearchTweaks, inherit=True)
+    p.implements(p.IAuthFunctions)
     p.implements(p.IBlueprint)
     p.implements(p.IConfigurer, inherit=True)
 
     # ISearchTweaks
-    def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
+    def get_search_boost_fn(
+        self, search_params: dict[str, Any]
+    ) -> Optional[str]:
         if feature_disabled("field_boost", search_params):
             return
 
         return tk.config.get(CONFIG_BOOST_FN, DEFAULT_BOOST_FN)
-
 
     # IBlueprint
 
@@ -37,3 +39,19 @@ class FieldRelevancePlugin(p.SingletonPlugin):
     def update_config(self, config):
         tk.add_template_directory(config, "templates")
         tk.add_resource("assets", "search_tweaks_field_relevance")
+
+
+    # IAuthFunctions
+    def get_auth_functions(self):
+        return {
+            "search_tweaks_field_relevance_promote": search_tweaks_field_relevance_promote,
+        }
+
+
+def search_tweaks_field_relevance_promote(context, data_dict):
+    try:
+        tk.check_access("package_update", context, data_dict)
+    except tk.NotAuthorized:
+        return {"success": False}
+
+    return {"success": True}

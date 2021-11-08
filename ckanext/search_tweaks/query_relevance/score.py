@@ -1,6 +1,10 @@
 from typing import Optional, Type
 import ckan.plugins.toolkit as tk
-from .storage import PermanentRedisScoreStorage, DailyRedisScoreStorage, ScoreStorage
+from .storage import (
+    PermanentRedisScoreStorage,
+    DailyRedisScoreStorage,
+    ScoreStorage,
+)
 
 _backends = {
     "redis-permanent": PermanentRedisScoreStorage,

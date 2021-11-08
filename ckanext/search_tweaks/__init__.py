@@ -8,9 +8,7 @@ DEFAULT_PREFER_BOOST = True
 
 
 def boost_preffered() -> bool:
-    return tk.asbool(
-        tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST)
-    )
+    return tk.asbool(tk.config.get(CONFIG_PREFER_BOOST, DEFAULT_PREFER_BOOST))
 
 
 def feature_disabled(feature: str, search_params: dict[str, Any]) -> bool:

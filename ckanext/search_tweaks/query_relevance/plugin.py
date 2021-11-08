@@ -32,7 +32,9 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
     # IPackageController
 
     def before_index(self, pkg_dict):
-        prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
+        prefix = tk.config.get(
+            CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX
+        )
 
         for (_, query, score) in QueryScore.get_for(pkg_dict["id"]):
             query = query.replace(" ", "_")
@@ -48,11 +50,15 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
 
     # ISearchTweaks
 
-    def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
+    def get_search_boost_fn(
+        self, search_params: dict[str, Any]
+    ) -> Optional[str]:
         if feature_disabled("query_boost", search_params):
             return
 
-        prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
+        prefix = tk.config.get(
+            CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX
+        )
         disabled = tk.asbool(
             search_params.get("extras", {}).get(
                 "ext_search_tweaks_disable_relevance", False

@@ -178,6 +178,18 @@ line of code.
 	# (optional, default: None).
 	ckanext.search_tweaks.field_relevance.boost_function = pow(promoted_level,2)
 
+	# Field with dataset promotion level
+	# (optional, default: promotion_level).
+	ckanext.search_tweaks.field_relevance.blueprint.promotion.field_name = promotion
+
+	# Register pacakge promotion route
+	# (optional, default: False).
+	ckanext.search_tweaks.field_relevance.blueprint.promotion.enabled = true
+
+#### Auth functions
+
+	search_tweaks_field_relevance_promote: access package promotion route. Calls `package_update` by default.
+
 ---
 
 ### <a id="search_tweaks_spellcheck"></a> search_tweaks_spellcheck

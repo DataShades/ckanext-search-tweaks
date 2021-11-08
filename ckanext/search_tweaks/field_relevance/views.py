@@ -7,10 +7,18 @@ from flask.views import MethodView
 import ckan.model as model
 import ckan.plugins.toolkit as tk
 
-CONFIG_ENABLE_PROMOTION_ROUTE = "ckanext.search_tweaks.field_relevance.blueprint.promotion.enabled"
-CONFIG_PROMOTION_PATH = "ckanext.search_tweaks.field_relevance.blueprint.promotion.path"
-CONFIG_MAX_PROMOTION = "ckanext.search_tweaks.field_relevance.blueprint.promotion.max_value"
-CONFIG_PROMOTION_FIELD = "ckanext.search_tweaks.field_relevance.blueprint.promotion.field_name"
+CONFIG_ENABLE_PROMOTION_ROUTE = (
+    "ckanext.search_tweaks.field_relevance.blueprint.promotion.enabled"
+)
+CONFIG_PROMOTION_PATH = (
+    "ckanext.search_tweaks.field_relevance.blueprint.promotion.path"
+)
+CONFIG_MAX_PROMOTION = (
+    "ckanext.search_tweaks.field_relevance.blueprint.promotion.max_value"
+)
+CONFIG_PROMOTION_FIELD = (
+    "ckanext.search_tweaks.field_relevance.blueprint.promotion.field_name"
+)
 
 DEFAULT_ENABLE_PROMOTION_ROUTE = False
 DEFAULT_PROMOTION_PATH = "/dataset/promote/<id>"
@@ -19,22 +27,25 @@ DEFAULT_PROMOTION_FIELD = "promotion_level"
 
 field_relevance = Blueprint("search_tweaks_field_relevance", __name__)
 
+
 def get_blueprints():
-    if tk.asbool(tk.config.get(CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE)):
+    if tk.asbool(
+        tk.config.get(
+            CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE
+        )
+    ):
         path = tk.config.get(CONFIG_PROMOTION_PATH, DEFAULT_PROMOTION_PATH)
         field_relevance.add_url_rule(
             path, view_func=PromoteView.as_view("promote")
         )
 
-    return [
-        field_relevance
-    ]
+    return [field_relevance]
 
 
 class PromoteView(MethodView):
     def _check_access(self, id: str) -> None:
         try:
-            tk.check_access("package_update", {}, {"id": id})
+            tk.check_access("search_tweaks_field_relevance_promote", {}, {"id": id})
         except tk.NotAuthorized:
             return tk.abort(403, tk._("Unauthorized to read package %s") % id)
 
@@ -59,12 +70,23 @@ class PromoteView(MethodView):
 
         if errors:
             return self.get(id, data, errors)
-        pkg_dict = tk.get_action("package_patch")(
-            {}, {"id": id, field: data[field]}
-        )
+        try:
+            pkg_dict = tk.get_action("package_patch")(
+                {}, {"id": id, field: data[field]}
+            )
+        except tk.ValidationError as e:
+            for k, v in e.error_summary.items():
+                tk.h.flash_error(f"{k}: {v}")
+            return self.get(id, data, e.error_dict)
+
         return tk.redirect_to("dataset.read", id=pkg_dict["name"])
 
-    def get(self, id, data: Optional[dict[str, Any]] = None, errors: Optional[dict[str, Any]] = None):
+    def get(
+        self,
+        id,
+        data: Optional[dict[str, Any]] = None,
+        errors: Optional[dict[str, Any]] = None,
+    ):
         self._check_access(id)
         field = tk.config.get(CONFIG_PROMOTION_FIELD, DEFAULT_PROMOTION_FIELD)
         pkg_dict = tk.get_action("package_show")({}, {"id": id})
@@ -75,7 +97,9 @@ class PromoteView(MethodView):
             "max_promotion": tk.asint(
                 tk.config.get(CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION)
             ),
-            "field_name": field
+            "field_name": field,
         }
 
-        return tk.render("search_tweaks/field_relevance/promote.html", extra_vars)
+        return tk.render(
+            "search_tweaks/field_relevance/promote.html", extra_vars
+        )

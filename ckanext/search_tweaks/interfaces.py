@@ -6,7 +6,9 @@ from . import CONFIG_PREFER_BOOST
 
 
 class ISearchTweaks(Interface):
-    def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
+    def get_search_boost_fn(
+        self, search_params: dict[str, Any]
+    ) -> Optional[str]:
         f"""Return Solr's boost function applicable to the current search.
 
         Note: it will be applied as `boost` when `{CONFIG_PREFER_BOOST}`
