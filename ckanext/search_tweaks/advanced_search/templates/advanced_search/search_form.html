@@ -21,6 +21,7 @@ labels - dict with all the labels/placeholder used through form. Check template 
 {% endfor %}
 {% set enable_advanced = enable_advanced|default(ns.enable_advanced) %}
 {% set labels = labels|default({}) %}
+{% set solr_syntax_url = solr_syntax_url or 'https://solr.apache.org/guide/6_6/common-query-parameters.html' %}
 
 
 {% set default_search_button %}
@@ -87,7 +88,7 @@ labels - dict with all the labels/placeholder used through form. Check template 
 	    <label for="toggle-enable-solr">
 		{{ labels.solr_toggle or _('Add query syntax to search') }}
 	    </label>
-	    <a target="_blank" href="https://solr.apache.org/guide/6_6/common-query-parameters.html">
+	    <a target="_blank" href="{{ solr_syntax_url }}">
 		<i class="fa fa-info-circle" data-placement="top" data-toggle="tooltip"
 		   title="{{ labels.solr_explanation or _('This adds SOLR query language, for more information on how to use click here') }}"></i>
 	    </a>
