@@ -99,6 +99,10 @@ following methods:
 	# (optional, default: 1).
 	ckanext.search_tweaks.common.mm = 2<-1 5<80%
 
+    # Keep original query when using fuzzy search, e.g. "(hello~2) OR (hello)" if true
+    # (optional, default: true).
+    ckanext.search_tweaks.common.fuzzy_search.keep_original
+
 
 ---
 

@@ -40,7 +40,7 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
 
     # IPackageController
 
-    def before_search(self, search_params: SearchParams):
+    def before_dataset_search(self, search_params: SearchParams):
         if feature_disabled("everything", search_params):
             return search_params
 

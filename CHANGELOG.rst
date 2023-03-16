@@ -1,3 +1,12 @@
+ckanext-search-tweaks 0.4.12 (2023-03-16)
+========================================
+
+Deprecations and Removals
+-------------------------
+
+- Switch from deprecated `before_search` to `before_dataset_search`
+
+
 ckanext-search-tweaks 0.1.7 (2021-06-18)
 ========================================
 
