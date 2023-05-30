@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
-
 from typing import Any, Dict
+
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 from ckan.lib.search.query import QUERY_FIELDS
 
-from . import cli, boost_preffered, feature_disabled
+from . import boost_preffered, cli, feature_disabled
 from .interfaces import ISearchTweaks
 
 log = logging.getLogger(__name__)
@@ -18,9 +18,7 @@ CONFIG_QF = "ckanext.search_tweaks.common.qf"
 CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
 CONFIG_FUZZY_DISTANCE = "ckanext.search_tweaks.common.fuzzy_search.distance"
 CONFIG_MM = "ckanext.search_tweaks.common.mm"
-CONFIG_FUZZY_KEEP_ORIGINAL = (
-    "ckanext.search_tweaks.common.fuzzy_search.keep_original"
-)
+CONFIG_FUZZY_KEEP_ORIGINAL = "ckanext.search_tweaks.common.fuzzy_search.keep_original"
 
 DEFAULT_QF = QUERY_FIELDS
 DEFAULT_FUZZY = False
@@ -83,9 +81,7 @@ def _set_qf(search_params: SearchParams) -> None:
     if feature_disabled("qf", search_params):
         return
 
-    default_qf: str = search_params.get("qf") or tk.config.get(
-        CONFIG_QF, DEFAULT_QF
-    )
+    default_qf: str = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
     search_params.setdefault("qf", default_qf)
     for plugin in plugins.PluginImplementations(ISearchTweaks):
         extra_qf = plugin.get_extra_qf(search_params)
@@ -129,9 +125,7 @@ def _set_fuzzy(search_params: SearchParams) -> None:
 
 
 def _get_fuzzy_distance() -> int:
-    distance = tk.asint(
-        tk.config.get(CONFIG_FUZZY_DISTANCE, DEFAULT_FUZZY_DISTANCE)
-    )
+    distance = tk.asint(tk.config.get(CONFIG_FUZZY_DISTANCE, DEFAULT_FUZZY_DISTANCE))
     if distance < 0:
         log.warning("Cannot use negative fuzzy distance: %s.", distance)
         distance = 0

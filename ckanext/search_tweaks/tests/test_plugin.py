@@ -1,10 +1,10 @@
 import pytest
 
-import ckan.plugins as p
 import ckan.lib.search.query as query
+import ckan.plugins as p
 
-from ckanext.search_tweaks import CONFIG_PREFER_BOOST
 import ckanext.search_tweaks.plugin as plugin
+from ckanext.search_tweaks import CONFIG_PREFER_BOOST
 
 
 @pytest.mark.usefixtures("with_plugins")
@@ -63,19 +63,13 @@ class TestFuzzy:
     @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
     @pytest.mark.parametrize("distance", [1, 2])
     def test_fuzzy_enabled(self, search, distance, ckan_config, monkeypatch):
-        monkeypatch.setitem(
-            ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance
-        )
+        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"
         assert search(q="hello")["q"] == f"hello~{distance}"
+        assert search(q="hello world")["q"] == f"hello~{distance} world~{distance}"
+        assert search(q="hello:world")["q"] == "hello:world"
         assert (
-            search(q="hello world")["q"]
-            == f"hello~{distance} world~{distance}"
-        )
-        assert search(q="hello:world")["q"] == f"hello:world"
-        assert (
-            search(q="hello AND world")["q"]
-            == f"hello~{distance} AND world~{distance}"
+            search(q="hello AND world")["q"] == f"hello~{distance} AND world~{distance}"
         )
 
     @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
@@ -83,9 +77,7 @@ class TestFuzzy:
     def test_fuzzy_enabled_with_too_low_distance(
         self, search, distance, ckan_config, monkeypatch
     ):
-        monkeypatch.setitem(
-            ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance
-        )
+        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
         assert search(q="")["q"] == "*:*"
         assert search(q="hello")["q"] == "hello"
         assert search(q="hello world")["q"] == "hello world"
@@ -98,9 +90,7 @@ class TestFuzzy:
     def test_fuzzy_enabled_with_too_high_distance(
         self, search, distance, ckan_config, monkeypatch
     ):
-        monkeypatch.setitem(
-            ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance
-        )
+        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"
         assert search(q="hello")["q"] == "hello~2"
         assert search(q="hello world")["q"] == "hello~2 world~2"
@@ -112,16 +102,14 @@ class TestFuzzy:
     def test_fuzzy_keep_original_query(
         self, search, distance, ckan_config, monkeypatch
     ):
-        monkeypatch.setitem(
-            ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance
-        )
+        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"
         assert search(q="hello")["q"] == f"(hello~{distance}) OR (hello)"
         assert (
             search(q="hello world")["q"]
             == f"(hello~{distance} world~{distance}) OR (hello world)"
         )
-        assert search(q="hello:world")["q"] == f"hello:world"
+        assert search(q="hello:world")["q"] == "hello:world"
         assert (
             search(q="hello AND world")["q"]
             == f"(hello~{distance} AND world~{distance}) OR (hello AND world)"

@@ -6,24 +6,18 @@ from bs4 import BeautifulSoup
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.tests.factories import Dataset
-from ckanext.search_tweaks.spellcheck import (
-    CONFIG_SHOW_ONLY_MORE,
-    rebuild_dictionary,
-)
+
+from ckanext.search_tweaks.spellcheck import CONFIG_SHOW_ONLY_MORE, rebuild_dictionary
 
 
-@pytest.mark.ckan_config(
-    "ckan.plugins", "search_tweaks search_tweaks_spellcheck"
-)
+@pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins")
 class TestSpellcheck:
     def test_plugin_loaded(self):
         assert p.plugin_loaded("search_tweaks_spellcheck")
 
 
-@pytest.mark.ckan_config(
-    "ckan.plugins", "search_tweaks search_tweaks_spellcheck"
-)
+@pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins", "with_request_context")
 class TestDidYouMeanSnippet:
     def test_empty_without_data(self):
@@ -41,9 +35,7 @@ class TestDidYouMeanSnippet:
 
 
 @pytest.mark.ckanext_search_tweaks_modified_schema
-@pytest.mark.ckan_config(
-    "ckan.plugins", "search_tweaks search_tweaks_spellcheck"
-)
+@pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
 class TestHelper:
     def test_recommendations(self):

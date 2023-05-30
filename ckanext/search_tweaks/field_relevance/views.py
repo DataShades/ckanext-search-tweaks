@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Any, Optional
 
 from flask import Blueprint
@@ -10,9 +11,7 @@ import ckan.plugins.toolkit as tk
 CONFIG_ENABLE_PROMOTION_ROUTE = (
     "ckanext.search_tweaks.field_relevance.blueprint.promotion.enabled"
 )
-CONFIG_PROMOTION_PATH = (
-    "ckanext.search_tweaks.field_relevance.blueprint.promotion.path"
-)
+CONFIG_PROMOTION_PATH = "ckanext.search_tweaks.field_relevance.blueprint.promotion.path"
 CONFIG_MAX_PROMOTION = (
     "ckanext.search_tweaks.field_relevance.blueprint.promotion.max_value"
 )
@@ -30,14 +29,10 @@ field_relevance = Blueprint("search_tweaks_field_relevance", __name__)
 
 def get_blueprints():
     if tk.asbool(
-        tk.config.get(
-            CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE
-        )
+        tk.config.get(CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE)
     ):
         path = tk.config.get(CONFIG_PROMOTION_PATH, DEFAULT_PROMOTION_PATH)
-        field_relevance.add_url_rule(
-            path, view_func=PromoteView.as_view("promote")
-        )
+        field_relevance.add_url_rule(path, view_func=PromoteView.as_view("promote"))
 
     return [field_relevance]
 
@@ -100,6 +95,4 @@ class PromoteView(MethodView):
             "field_name": field,
         }
 
-        return tk.render(
-            "search_tweaks/field_relevance/promote.html", extra_vars
-        )
+        return tk.render("search_tweaks/field_relevance/promote.html", extra_vars)

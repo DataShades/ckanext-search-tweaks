@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 import json
 from typing import Any
+
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.exceptions import CkanConfigurationException
@@ -75,14 +77,15 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
                 "ckanext-composite-search is not installed"
             )
         if not p.plugin_loaded("composite_search"):
-            raise CkanConfigurationException(
-                "`composite_search` plugin must be enabled in order to use advanced search"
-            )
+            msg = "Advanced search requires `composite_search` plugin"
+            raise CkanConfigurationException(msg)
         if not list(p.PluginImplementations(ICompositeSearch)):
-            raise CkanConfigurationException(
-                "Advanced search requires plugin that implements ICompositeSearch."
-                + " Consider enabling `default_composite_search` plugins."
+            msg = (
+                "Advanced search requires plugin that implements"
+                + " ICompositeSearch. Consider enabling "
+                + "`default_composite_search` plugins."
             )
+            raise CkanConfigurationException(msg)
 
     # ITemplateHelpers
 

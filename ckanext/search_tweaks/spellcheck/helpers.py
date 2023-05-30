@@ -6,11 +6,7 @@ from typing import Any, Optional
 import ckan.plugins.toolkit as tk
 from ckan.lib.search.common import make_connection
 
-from . import (
-    get_spellcheck_params,
-    CONFIG_SHOW_ONLY_MORE,
-    DEFAULT_SHOW_ONLY_MORE,
-)
+from . import CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE, get_spellcheck_params
 
 CONFIG_MAX_SUGGESTIONS = "ckanext.search_tweaks.spellcheck.max_suggestions"
 CONFIG_SUGGESTION_FOR_SINGLE = (
@@ -56,9 +52,7 @@ def spellcheck_did_you_mean(
         )
 
     use_suggestion_for_single = tk.asbool(
-        tk.config.get(
-            CONFIG_SUGGESTION_FOR_SINGLE, DEFAULT_SUGGESTION_FOR_SINGLE
-        )
+        tk.config.get(CONFIG_SUGGESTION_FOR_SINGLE, DEFAULT_SUGGESTION_FOR_SINGLE)
     )
     terms = q.split()
     if len(terms) == 1 and use_suggestion_for_single:
@@ -66,9 +60,7 @@ def spellcheck_did_you_mean(
         return spellcheck.suggestions.get(terms[0], [])[:max_suggestions]
 
     collations = [
-        str(c)
-        for c in spellcheck.best_collations(max_suggestions)
-        if min_hits < c
+        str(c) for c in spellcheck.best_collations(max_suggestions) if min_hits < c
     ]
 
     if len(collations) < max_suggestions:
@@ -79,11 +71,7 @@ def spellcheck_did_you_mean(
 
         # TODO: check min hits
         new_q = " ".join(
-            [
-                spellcheck.suggestions[w][0]
-                for w in terms
-                if w in spellcheck.suggestions
-            ]
+            [spellcheck.suggestions[w][0] for w in terms if w in spellcheck.suggestions]
         )
         if new_q:
             collations.append(new_q)
@@ -142,7 +130,11 @@ class SpellcheckResult:
     suggestions: dict[str, list[str]]
 
     def __repr__(self):
-        return f"<Spellcheck(collations={self.collations}, suggestions={self.suggestions})>"
+        return (
+            "<Spellcheck("
+            + f"collations={self.collations}, suggestions={self.suggestions}"
+            + ")>"
+        )
 
     def __init__(self, collations: list[Any], suggestions: list[Any]):
         self.collations = [Collation(item) for item in collations[1::2]]
