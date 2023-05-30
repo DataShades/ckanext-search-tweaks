@@ -93,9 +93,12 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
 
     # IPackageController
 
-    def before_search(self, search_params: dict[str, Any]):
+    def before_dataset_search(self, search_params: dict[str, Any]):
         solr_q = search_params.get("extras", {}).get("ext_solr_q", None)
         if solr_q:
             search_params.setdefault("q", "")
             search_params["q"] += " " + solr_q
         return search_params
+
+    if not tk.check_ckan_version("2.10"):
+        before_search = before_dataset_search
