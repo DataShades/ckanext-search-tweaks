@@ -30,7 +30,6 @@ def search_tweaks_query_popularity_export(
     return {"results": results, "count": len(results)}
 
 
-@tk.side_effect_free
 def search_tweaks_query_popularity_ignore(
     context: types.Context, data_dict: dict[str, Any]
 ):

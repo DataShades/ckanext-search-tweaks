@@ -26,7 +26,7 @@ class Score:
 
     def export(self):
         data: dict[bytes, dict[str, Any]] = {
-            hash: {"query": query, "records": []}
+            hash: {"query": query.decode(), "records": []}
             for hash, query in self.redis.hgetall(self.trans_key()).items()
         }
         for k, v in self.redis.hscan_iter(self.distribution_key()):
@@ -36,7 +36,7 @@ class Score:
             except ValueError:
                 continue
 
-            data[q_hash]["records"].append({"date": date, "count": int(v)})
+            data[q_hash]["records"].append({"date": date.isoformat(), "count": int(v)})
 
         return list(data.values())
 
@@ -155,11 +155,14 @@ class Score:
     def format_date_stem(self, date: datetime):
         return date.strftime(self.date_format)
 
-    def stats(self, num: int) -> Iterable[dict[str, Any]]:
+    def stats(self, num: int) -> Iterable[dict[str, str | float]]:
         scores: list[tuple[bytes, float]] = self.redis.zrange(
             self.score_key(), 0, num - 1, desc=True, withscores=True
         )
         trans_key = self.trans_key()
 
         for k, v in scores:
-            yield {"query": self.redis.hget(trans_key, k), "score": v}
+            query = self.redis.hget(trans_key, k)
+            if not query:
+                continue
+            yield {"query": query.decode(), "score": v}
