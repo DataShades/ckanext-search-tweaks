@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.6.0](https://github.com/dataShades/ckanext-search-tweaks/releases/tag/v0.6.0) - 2023-11-04
+
+<small>[Compare with v0.5.0](https://github.com/dataShades/ckanext-search-tweaks/compare/v0.5.0...v0.6.0)</small>
+
+### Features
+
+- drop CKAN v2.9 support ([31d1840](https://github.com/dataShades/ckanext-search-tweaks/commit/31d1840cac706f1e438601b6a4638d15ead60263) by Sergey Motornyuk).
+- query_popularity plugin ([27ef0c4](https://github.com/dataShades/ckanext-search-tweaks/commit/27ef0c4f89ad11bf295db62f65d0a7262189edc9) by Sergey Motornyuk).
+
 ## [v0.5.0](https://github.com/dataShades/ckanext-search-tweaks/releases/tag/v0.5.0) - 2023-05-30
 
 <small>[Compare with v0.4.12](https://github.com/dataShades/ckanext-search-tweaks/compare/v0.4.12...v0.5.0)</small>
