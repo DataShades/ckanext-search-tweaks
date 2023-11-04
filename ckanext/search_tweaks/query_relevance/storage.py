@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractclassmethod, abstractmethod
 from datetime import date, timedelta
-from typing import Any, Iterable, Optional, cast, Tuple
+from typing import Any, Iterable, cast, Tuple
 
 import ckan.plugins.toolkit as tk
 from ckan.lib.redis import connect_to_redis, Redis
@@ -37,7 +37,7 @@ class ScoreStorage(ABC):
 
     @classmethod
     @abstractclassmethod
-    def scan(cls, id_: Optional[str] = None) -> Iterable[ScanItem]:
+    def scan(cls, id_: str | None = None) -> Iterable[ScanItem]:
         """Get all the scores."""
         ...
 
@@ -53,11 +53,10 @@ class ScoreStorage(ABC):
 
     def align(self) -> None:
         """Make some cleanup in order to maintain fast and correct value."""
-        pass
 
 
 class RedisScoreStorage(ScoreStorage):
-    _conn: Optional[Redis] = None
+    _conn: Redis | None = None
 
     @property
     def conn(self):
@@ -109,13 +108,10 @@ class PermanentRedisScoreStorage(RedisScoreStorage):
         return f"{self._common_key_part()}:{self.id}"
 
     @classmethod
-    def scan(cls, id_: Optional[str] = None) -> Iterable[ScanItem]:
+    def scan(cls, id_: str | None = None) -> Iterable[ScanItem]:
         conn = cls.connect()
         common_key = cls._common_key_part()
-        if id_:
-            pattern = f"{common_key}:{id_}"
-        else:
-            pattern = f"{common_key}:*"
+        pattern = f"{common_key}:{id_}" if id_ else f"{common_key}:*"
         for key in conn.keys(pattern):
             _, row_id = key.rsplit(b":", 1)
             for query, score in conn.hgetall(key).items():
@@ -169,13 +165,10 @@ class DailyRedisScoreStorage(RedisScoreStorage):
         return date.today().isoformat()
 
     @classmethod
-    def scan(cls, id_: Optional[str] = None) -> Iterable[ScanItem]:
+    def scan(cls, id_: str | None = None) -> Iterable[ScanItem]:
         conn = cls.connect()
         common_key = cls._common_key_part()
-        if id_:
-            pattern = f"{common_key}:{id_}:*"
-        else:
-            pattern = f"{common_key}:*"
+        pattern = f"{common_key}:{id_}:*" if id_ else f"{common_key}:*"
         for key in conn.keys(pattern):
             _, id_, query = key.decode().rsplit(":", 2)
             yield id_, query, cls(id_, query).get()

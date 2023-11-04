@@ -5,8 +5,8 @@ from typing import Any
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 
-from .. import feature_disabled
-from ..interfaces import ISearchTweaks
+from ckanext.search_tweaks import feature_disabled
+from ckanext.search_tweaks.interfaces import ISearchTweaks
 from . import views
 
 CONFIG_BOOST_FN = "ckanext.search_tweaks.field_relevance.boost_function"
@@ -23,7 +23,7 @@ class FieldRelevancePlugin(p.SingletonPlugin):
     # ISearchTweaks
     def get_search_boost_fn(self, search_params: dict[str, Any]) -> str | None:
         if feature_disabled("field_boost", search_params):
-            return
+            return None
 
         return tk.config.get(CONFIG_BOOST_FN, DEFAULT_BOOST_FN)
 

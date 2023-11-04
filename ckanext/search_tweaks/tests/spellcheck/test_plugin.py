@@ -48,7 +48,7 @@ class TestHelper:
         assert helper("do nat touc me") == ["do not touch me"]
 
         assert helper("pic", 3) == [
-            "pick"
+            "pick",
         ]  # min_hits fucked up because of single-term match
         assert helper("pic", 1) == ["pick"]
 
@@ -61,7 +61,7 @@ class TestHelper:
 
         assert helper("pock", 1) == ["pick"]
         assert helper("pick", 3) == [
-            "pock"
+            "pock",
         ]  # min_hits fucked up because of single-term match
 
         monkeypatch.setitem(ckan_config, CONFIG_SHOW_ONLY_MORE, "off")

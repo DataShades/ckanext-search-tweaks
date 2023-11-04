@@ -37,14 +37,14 @@ DEFAULT_FORM_DEFINITION = json.dumps(
                 {"value": "private", "label": "Private"},
             ],
         },
-    }
+    },
 )
 DEFAULT_FIELD_ORDER = None
 
 
 def form_config():
     definition = json.loads(
-        tk.config.get(CONFIG_FORM_DEFINITION, DEFAULT_FORM_DEFINITION)
+        tk.config.get(CONFIG_FORM_DEFINITION, DEFAULT_FORM_DEFINITION),
     )
     order = tk.aslist(tk.config.get(CONFIG_FIELD_ORDER, DEFAULT_FIELD_ORDER))
     if not order:
@@ -74,7 +74,7 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
             from ckanext.composite_search.interfaces import ICompositeSearch
         except ImportError:
             raise CkanConfigurationException(
-                "ckanext-composite-search is not installed"
+                "ckanext-composite-search is not installed",
             )
         if not p.plugin_loaded("composite_search"):
             msg = "Advanced search requires `composite_search` plugin"

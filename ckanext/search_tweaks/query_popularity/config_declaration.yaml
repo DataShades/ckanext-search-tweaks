@@ -1,0 +1,21 @@
+version: 1
+groups:
+  - annotation: "ckanext-search-tweaks: query popularity"
+    options:
+      - key: ckanext.search_tweaks.query_popularity.skip_irrefutable_search
+        type: bool
+        default: true
+
+      - key: ckanext.search_tweaks.query_popularity.ignored_symbols
+        default: ":"
+
+      - key: ckanext.search_tweaks.query_popularity.ignored_terms
+        type: list
+
+      - key: ckanext.search_tweaks.query_popularity.query_throttle
+        type: int
+        default: 86_400 # 24 hours
+
+      - key: ckanext.search_tweaks.query_popularity.max_age
+        type: int
+        default: 2_592_000 # 30 days

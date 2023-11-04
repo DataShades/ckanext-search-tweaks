@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from string import Template
-from typing import Any, Optional
+from typing import Any
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 
-from .. import feature_disabled
-from ..cli import attach_relevance_command
-from ..interfaces import ISearchTweaks
+from ckanext.search_tweaks import feature_disabled
+from ckanext.search_tweaks.cli import attach_relevance_command
+from ckanext.search_tweaks.interfaces import ISearchTweaks
 from . import QueryScore, cli, normalize_query, update_score_by_url
 
 CONFIG_BOOST_STRING = "ckanext.search_tweaks.query_relevance.boost_function"
@@ -30,7 +30,7 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
 
     # IPackageController
 
-    def before_index(self, pkg_dict):
+    def before_dataset_index(self, pkg_dict):
         prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
 
         for _, query, score in QueryScore.get_for(pkg_dict["id"]):
@@ -47,27 +47,28 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
 
     # ISearchTweaks
 
-    def get_search_boost_fn(self, search_params: dict[str, Any]) -> Optional[str]:
+    def get_search_boost_fn(self, search_params: dict[str, Any]) -> str | None:
         if feature_disabled("query_boost", search_params):
-            return
+            return None
 
         prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
         disabled = tk.asbool(
             search_params.get("extras", {}).get(
-                "ext_search_tweaks_disable_relevance", False
-            )
+                "ext_search_tweaks_disable_relevance",
+                False,
+            ),
         )
 
         if not search_params.get("q") or disabled:
-            return
+            return None
 
         normalized = normalize_query(search_params["q"]).replace(" ", "_")
         if not normalized:
-            return
+            return None
 
         field = prefix + normalized
         boost_string = Template(
-            tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING)
+            tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING),
         )
 
         return boost_string.safe_substitute({"field": field})

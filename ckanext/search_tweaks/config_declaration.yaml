@@ -1,0 +1,24 @@
+version: 1
+groups:
+  - annotation: "ckanext-search-tweaks: common"
+    options:
+      - key: ckanext.search_tweaks.common.qf
+        placeholder: "name^4 title^4 tags^2 groups^2 text"
+
+      - key: ckanext.search_tweaks.common.mm
+        default: "1"
+
+      - key: ckanext.search_tweaks.common.fuzzy_search.enabled
+        type: bool
+
+      - key: ckanext.search_tweaks.common.fuzzy_search.distance
+        type: int
+        default: 1
+
+      - key: ckanext.search_tweaks.common.fuzzy_search.keep_original
+        type: bool
+        default: true
+
+      - key: ckanext.search_tweaks.common.prefer_boost
+        type: bool
+        default: true

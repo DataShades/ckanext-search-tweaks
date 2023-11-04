@@ -4,7 +4,8 @@ import ckan.lib.search.query as query
 import ckan.plugins as p
 
 import ckanext.search_tweaks.plugin as plugin
-from ckanext.search_tweaks import CONFIG_PREFER_BOOST
+import ckanext.search_tweaks.config as config
+from ckanext.search_tweaks.config import CONFIG_PREFER_BOOST
 
 
 @pytest.mark.usefixtures("with_plugins")
@@ -45,7 +46,7 @@ class TestPlugin:
     def test_default_qf(self, search):
         assert search()["qf"] == query.QUERY_FIELDS
 
-    @pytest.mark.ckan_config(plugin.CONFIG_QF, "title^10 name^0.1")
+    @pytest.mark.ckan_config(config.CONFIG_QF, "title^10 name^0.1")
     def test_modified_qf(self, search):
         assert search()["qf"] == "title^10 name^0.1"
 
@@ -59,11 +60,11 @@ class TestFuzzy:
         assert search(q="hello:world")["q"] == "hello:world"
         assert search(q="hello AND world")["q"] == "hello AND world"
 
-    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY_KEEP_ORIGINAL, False)
-    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
+    @pytest.mark.ckan_config(config.CONFIG_FUZZY_KEEP_ORIGINAL, False)
+    @pytest.mark.ckan_config(config.CONFIG_FUZZY, True)
     @pytest.mark.parametrize("distance", [1, 2])
     def test_fuzzy_enabled(self, search, distance, ckan_config, monkeypatch):
-        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
+        monkeypatch.setitem(ckan_config, config.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"
         assert search(q="hello")["q"] == f"hello~{distance}"
         assert search(q="hello world")["q"] == f"hello~{distance} world~{distance}"
@@ -72,37 +73,37 @@ class TestFuzzy:
             search(q="hello AND world")["q"] == f"hello~{distance} AND world~{distance}"
         )
 
-    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
+    @pytest.mark.ckan_config(config.CONFIG_FUZZY, True)
     @pytest.mark.parametrize("distance", [-10, -1, 0])
     def test_fuzzy_enabled_with_too_low_distance(
-        self, search, distance, ckan_config, monkeypatch
+        self, search, distance, ckan_config, monkeypatch,
     ):
-        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
+        monkeypatch.setitem(ckan_config, config.CONFIG_FUZZY_DISTANCE, distance)
         assert search(q="")["q"] == "*:*"
         assert search(q="hello")["q"] == "hello"
         assert search(q="hello world")["q"] == "hello world"
         assert search(q="hello:world")["q"] == "hello:world"
         assert search(q="hello AND world")["q"] == "hello AND world"
 
-    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY_KEEP_ORIGINAL, False)
-    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
+    @pytest.mark.ckan_config(config.CONFIG_FUZZY_KEEP_ORIGINAL, False)
+    @pytest.mark.ckan_config(config.CONFIG_FUZZY, True)
     @pytest.mark.parametrize("distance", [3, 20, 111])
     def test_fuzzy_enabled_with_too_high_distance(
-        self, search, distance, ckan_config, monkeypatch
+        self, search, distance, ckan_config, monkeypatch,
     ):
-        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
+        monkeypatch.setitem(ckan_config, config.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"
         assert search(q="hello")["q"] == "hello~2"
         assert search(q="hello world")["q"] == "hello~2 world~2"
         assert search(q="hello:world")["q"] == "hello:world"
         assert search(q="hello AND world")["q"] == "hello~2 AND world~2"
 
-    @pytest.mark.ckan_config(plugin.CONFIG_FUZZY, "on")
+    @pytest.mark.ckan_config(config.CONFIG_FUZZY, True)
     @pytest.mark.parametrize("distance", [1, 2])
     def test_fuzzy_keep_original_query(
-        self, search, distance, ckan_config, monkeypatch
+        self, search, distance, ckan_config, monkeypatch,
     ):
-        monkeypatch.setitem(ckan_config, plugin.CONFIG_FUZZY_DISTANCE, distance)
+        monkeypatch.setitem(ckan_config, config.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"
         assert search(q="hello")["q"] == f"(hello~{distance}) OR (hello)"
         assert (

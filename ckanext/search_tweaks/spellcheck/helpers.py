@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import total_ordering
-from typing import Any, Optional
+from typing import Any
 
 import ckan.plugins.toolkit as tk
 from ckan.lib.search.common import make_connection
@@ -24,7 +24,7 @@ def get_helpers():
 
 
 def spellcheck_did_you_mean(
-    q: str, min_hits: int = 0, max_suggestions: int = None
+    q: str, min_hits: int = 0, max_suggestions: int = None,
 ) -> list[str]:
     """Return optimal query that can be used instead of the current one.
 
@@ -41,18 +41,18 @@ def spellcheck_did_you_mean(
     spellcheck = _do_spellcheck(q)
 
     show_only_more = tk.asbool(
-        tk.config.get(CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE)
+        tk.config.get(CONFIG_SHOW_ONLY_MORE, DEFAULT_SHOW_ONLY_MORE),
     )
     if not show_only_more:
         min_hits = -1
 
     if not max_suggestions:
         max_suggestions = tk.asint(
-            tk.config.get(CONFIG_MAX_SUGGESTIONS, DEFAULT_MAX_SUGGESTIONS)
+            tk.config.get(CONFIG_MAX_SUGGESTIONS, DEFAULT_MAX_SUGGESTIONS),
         )
 
     use_suggestion_for_single = tk.asbool(
-        tk.config.get(CONFIG_SUGGESTION_FOR_SINGLE, DEFAULT_SUGGESTION_FOR_SINGLE)
+        tk.config.get(CONFIG_SUGGESTION_FOR_SINGLE, DEFAULT_SUGGESTION_FOR_SINGLE),
     )
     terms = q.split()
     if len(terms) == 1 and use_suggestion_for_single:
@@ -71,7 +71,7 @@ def spellcheck_did_you_mean(
 
         # TODO: check min hits
         new_q = " ".join(
-            [spellcheck.suggestions[w][0] for w in terms if w in spellcheck.suggestions]
+            [spellcheck.suggestions[w][0] for w in terms if w in spellcheck.suggestions],
         )
         if new_q:
             collations.append(new_q)
@@ -139,8 +139,8 @@ class SpellcheckResult:
     def __init__(self, collations: list[Any], suggestions: list[Any]):
         self.collations = [Collation(item) for item in collations[1::2]]
         self.suggestions = dict(
-            zip(suggestions[::2], [s["suggestion"] for s in suggestions[1::2]])
+            zip(suggestions[::2], [s["suggestion"] for s in suggestions[1::2]]),
         )
 
-    def best_collations(self, n: Optional[int] = None) -> list[Collation]:
+    def best_collations(self, n: int | None = None) -> list[Collation]:
         return sorted(self.collations, reverse=True)[:n]

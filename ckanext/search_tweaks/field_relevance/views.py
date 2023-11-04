@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from flask import Blueprint
 from flask.views import MethodView
@@ -29,7 +29,7 @@ field_relevance = Blueprint("search_tweaks_field_relevance", __name__)
 
 def get_blueprints():
     if tk.asbool(
-        tk.config.get(CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE)
+        tk.config.get(CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE),
     ):
         path = tk.config.get(CONFIG_PROMOTION_PATH, DEFAULT_PROMOTION_PATH)
         field_relevance.add_url_rule(path, view_func=PromoteView.as_view("promote"))
@@ -52,9 +52,9 @@ class PromoteView(MethodView):
                 tk.get_validator("convert_int"),
                 tk.get_validator("natural_number_validator"),
                 tk.get_validator("limit_to_configured_maximum")(
-                    CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION
+                    CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION,
                 ),
-            ]
+            ],
         }
 
         data, errors = tk.navl_validate(
@@ -67,7 +67,7 @@ class PromoteView(MethodView):
             return self.get(id, data, errors)
         try:
             pkg_dict = tk.get_action("package_patch")(
-                {}, {"id": id, field: data[field]}
+                {}, {"id": id, field: data[field]},
             )
         except tk.ValidationError as e:
             for k, v in e.error_summary.items():
@@ -79,8 +79,8 @@ class PromoteView(MethodView):
     def get(
         self,
         id,
-        data: Optional[dict[str, Any]] = None,
-        errors: Optional[dict[str, Any]] = None,
+        data: dict[str, Any] | None = None,
+        errors: dict[str, Any] | None = None,
     ):
         self._check_access(id)
         field = tk.config.get(CONFIG_PROMOTION_FIELD, DEFAULT_PROMOTION_FIELD)
@@ -90,7 +90,7 @@ class PromoteView(MethodView):
             "errors": errors or {},
             "data": data or pkg_dict,
             "max_promotion": tk.asint(
-                tk.config.get(CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION)
+                tk.config.get(CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION),
             ),
             "field_name": field,
         }

@@ -1,54 +1,37 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict
+from typing import Any
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
-from ckan.lib.search.query import QUERY_FIELDS
-
-from . import boost_preffered, cli, feature_disabled
+from . import feature_disabled, config
 from .interfaces import ISearchTweaks
 
 log = logging.getLogger(__name__)
-
-SearchParams = Dict[str, Any]
-
-CONFIG_QF = "ckanext.search_tweaks.common.qf"
-CONFIG_FUZZY = "ckanext.search_tweaks.common.fuzzy_search.enabled"
-CONFIG_FUZZY_DISTANCE = "ckanext.search_tweaks.common.fuzzy_search.distance"
-CONFIG_MM = "ckanext.search_tweaks.common.mm"
-CONFIG_FUZZY_KEEP_ORIGINAL = "ckanext.search_tweaks.common.fuzzy_search.keep_original"
-
-DEFAULT_QF = QUERY_FIELDS
-DEFAULT_FUZZY = False
-DEFAULT_FUZZY_DISTANCE = 1
-DEFAULT_MM = "1"
-DEFAULT_FUZZY_KEEP_ORIGINAL = True
+CONFIG_PREFER_BOOST = "ckanext.search_tweaks.common.prefer_boost"
+DEFAULT_PREFER_BOOST = True
 
 
+@tk.blanket.cli
+@tk.blanket.config_declarations
 class SearchTweaksPlugin(plugins.SingletonPlugin):
-    plugins.implements(plugins.IClick)
     plugins.implements(plugins.IPackageController, inherit=True)
-
-    # IClick
-
-    def get_commands(self):
-        return cli.get_commands()
 
     # IPackageController
 
-    def before_dataset_search(self, search_params: SearchParams):
+    def before_dataset_search(self, search_params: dict[str, Any]):
         if feature_disabled("everything", search_params):
             return search_params
 
-        search_params.setdefault("mm", tk.config.get(CONFIG_MM, DEFAULT_MM))
+        search_params.setdefault("mm", config.mm())
 
         if "defType" not in search_params:
             search_params["defType"] = "edismax"
 
-        if boost_preffered() and search_params["defType"] == "edismax":
+        if config.prefer_boost() and search_params["defType"] == "edismax":
             _set_boost(search_params)
+
         else:
             _set_bf(search_params)
 
@@ -58,7 +41,7 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
         return search_params
 
 
-def _set_boost(search_params: SearchParams) -> None:
+def _set_boost(search_params: dict[str, Any]) -> None:
     boost: list[str] = search_params.setdefault("boost", [])
     for plugin in plugins.PluginImplementations(ISearchTweaks):
         extra = plugin.get_search_boost_fn(search_params)
@@ -67,7 +50,7 @@ def _set_boost(search_params: SearchParams) -> None:
         boost.append(extra)
 
 
-def _set_bf(search_params: SearchParams) -> None:
+def _set_bf(search_params: dict[str, Any]) -> None:
     default_bf: str = search_params.get("bf") or "0"
     search_params.setdefault("bf", default_bf)
     for plugin in plugins.PluginImplementations(ISearchTweaks):
@@ -77,11 +60,11 @@ def _set_bf(search_params: SearchParams) -> None:
         search_params["bf"] = f"sum({search_params['bf']},{extra_bf})"
 
 
-def _set_qf(search_params: SearchParams) -> None:
+def _set_qf(search_params: dict[str, Any]) -> None:
     if feature_disabled("qf", search_params):
         return
 
-    default_qf: str = search_params.get("qf") or tk.config.get(CONFIG_QF, DEFAULT_QF)
+    default_qf: str = search_params.get("qf") or config.qf()
     search_params.setdefault("qf", default_qf)
     for plugin in plugins.PluginImplementations(ISearchTweaks):
         extra_qf = plugin.get_extra_qf(search_params)
@@ -90,8 +73,8 @@ def _set_qf(search_params: SearchParams) -> None:
         search_params["qf"] += " " + extra_qf
 
 
-def _set_fuzzy(search_params: SearchParams) -> None:
-    if not tk.asbool(tk.config.get(CONFIG_FUZZY, DEFAULT_FUZZY)):
+def _set_fuzzy(search_params: dict[str, Any]) -> None:
+    if not config.fuzzy():
         return
 
     if feature_disabled("fuzzy", search_params):
@@ -114,18 +97,16 @@ def _set_fuzzy(search_params: SearchParams) -> None:
             if s.isalpha() and s not in ("AND", "OR", "TO")
             else s,
             q.split(),
-        )
+        ),
     )
-    if tk.asbool(
-        tk.config.get(CONFIG_FUZZY_KEEP_ORIGINAL, DEFAULT_FUZZY_KEEP_ORIGINAL)
-    ):
+    if config.fuzzy_with_original():
         search_params["q"] = f"({fuzzy_q}) OR ({q})"
     else:
         search_params["q"] = fuzzy_q
 
 
 def _get_fuzzy_distance() -> int:
-    distance = tk.asint(tk.config.get(CONFIG_FUZZY_DISTANCE, DEFAULT_FUZZY_DISTANCE))
+    distance = config.fuzzy_distance()
     if distance < 0:
         log.warning("Cannot use negative fuzzy distance: %s.", distance)
         distance = 0

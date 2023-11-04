@@ -1,6 +1,6 @@
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
-from ..cli import attach_main_command
+from ckanext.search_tweaks.cli import attach_main_command
 from . import cli, helpers
 
 

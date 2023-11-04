@@ -34,7 +34,7 @@ class QueryScore:
         query: str,
         *,
         normalize: bool = True,
-        storage_class: Optional[Type[ScoreStorage]] = None
+        storage_class: Optional[Type[ScoreStorage]] = None,
     ):
         if normalize:
             query = normalize_query(query)

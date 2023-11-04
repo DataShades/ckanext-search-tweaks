@@ -1,8 +1,8 @@
 import click
 
-
-def get_commands():
-    return [search_tweaks]
+__all__ = [
+    "search_tweaks",
+]
 
 
 @click.group(short_help="Search tweaks")

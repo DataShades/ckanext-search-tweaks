@@ -27,7 +27,7 @@ class TestStorages:
         assert sorted(list(storage.scan())) == sorted(
             [
                 ("key", "query", 10),
-            ]
+            ],
         )
 
         s2 = storage("second key", "second query")
@@ -37,7 +37,7 @@ class TestStorages:
             [
                 ("key", "query", 100),
                 ("second key", "second query", 5),
-            ]
+            ],
         )
 
         s3 = storage("key", "extra query")
@@ -47,14 +47,14 @@ class TestStorages:
                 ("key", "query", 100),
                 ("key", "extra query", 1),
                 ("second key", "second query", 5),
-            ]
+            ],
         )
 
         assert sorted(list(storage.scan("key"))) == sorted(
             [
                 ("key", "query", 100),
                 ("key", "extra query", 1),
-            ]
+            ],
         )
 
     def test_missing_key(self, storage):
