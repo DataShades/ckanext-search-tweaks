@@ -20,3 +20,11 @@ def throttle() -> int:
 
 def max_age() -> int:
     return tk.config["ckanext.search_tweaks.query_popularity.max_age"]
+
+
+def obsoletion_period() -> int:
+    return tk.config["ckanext.search_tweaks.query_popularity.obsoletion_period"]
+
+
+def tracked_endpoints() -> list[str]:
+    return tk.config["ckanext.search_tweaks.query_popularity.tracked_endpoints"]

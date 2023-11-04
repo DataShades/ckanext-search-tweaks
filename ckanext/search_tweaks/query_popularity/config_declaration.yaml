@@ -12,6 +12,10 @@ groups:
       - key: ckanext.search_tweaks.query_popularity.ignored_terms
         type: list
 
+      - key: ckanext.search_tweaks.query_popularity.tracked_endpoints
+        type: list
+        default: dataset.search
+
       - key: ckanext.search_tweaks.query_popularity.query_throttle
         type: int
         default: 86_400 # 24 hours
@@ -19,3 +23,7 @@ groups:
       - key: ckanext.search_tweaks.query_popularity.max_age
         type: int
         default: 2_592_000 # 30 days
+
+      - key: ckanext.search_tweaks.query_popularity.obsoletion_period
+        type: int
+        default: 86_400 # 24 hours

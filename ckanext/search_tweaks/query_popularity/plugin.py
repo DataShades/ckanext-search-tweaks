@@ -5,7 +5,9 @@ import ckan.plugins.toolkit as tk
 from ckanext.search_tweaks.interfaces import IQueryPopularity
 from . import config, score
 
+
 @tk.blanket.actions
+@tk.blanket.auth_functions
 @tk.blanket.config_declarations
 class QueryPopularityPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurable)
@@ -13,11 +15,13 @@ class QueryPopularityPlugin(p.SingletonPlugin):
     p.implements(IQueryPopularity, inherit=True)
 
     def after_dataset_search(self, results: dict[str, Any], params: dict[str, Any]):
-        if not any(
-            plugin.skip_query_popularity(params)
-            for plugin in p.PluginImplementations(IQueryPopularity)
-        ):
-            self.score.save(params["q"])
+        bp, view = tk.get_endpoint()
+        if bp and view and f"{bp}.{view}" in config.tracked_endpoints():
+            if not any(
+                plugin.skip_query_popularity(params)
+                for plugin in p.PluginImplementations(IQueryPopularity)
+            ):
+                self.score.save(params["q"])
 
         return results
 
