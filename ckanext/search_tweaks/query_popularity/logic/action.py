@@ -25,11 +25,10 @@ def search_tweaks_query_popularity_list(
 @tk.side_effect_free
 def search_tweaks_query_popularity_export(
     context: types.Context, data_dict: dict[str, Any]
-) -> dict[str, Any]:
+) -> list[Any]:
     score = Score()
 
-    results = score.export()
-    return {"snapshot": results}
+    return score.export()
 
 
 @validate(schema.query_popularity_import)
