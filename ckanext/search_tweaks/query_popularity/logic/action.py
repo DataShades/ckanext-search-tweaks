@@ -1,9 +1,11 @@
 from __future__ import annotations
 from typing import Any
 from ckan import types
+from ckan.logic import validate
 import ckan.plugins.toolkit as tk
 
 from ckanext.search_tweaks.query_popularity.score import Score
+from . import schema
 
 
 @tk.side_effect_free
@@ -28,6 +30,20 @@ def search_tweaks_query_popularity_export(
 
     results = score.export()
     return {"results": results, "count": len(results)}
+
+
+@validate(schema.query_popularity_import)
+def search_tweaks_query_popularity_import(
+    context: types.Context, data_dict: dict[str, Any]
+) -> dict[str, Any]:
+    tk.check_access("sysadmin", context, data_dict)
+    score = Score()
+
+    if tk.asbool(data_dict.get("reset")):
+        score.reset()
+    score.restore(data_dict["snapshot"])
+    score.refresh()
+    return {"success": True}
 
 
 def search_tweaks_query_popularity_ignore(

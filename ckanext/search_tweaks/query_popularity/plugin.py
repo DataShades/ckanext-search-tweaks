@@ -21,7 +21,7 @@ class QueryPopularityPlugin(p.SingletonPlugin):
                 plugin.skip_query_popularity(params)
                 for plugin in p.PluginImplementations(IQueryPopularity)
             ):
-                self.score.save(params["q"])
+                self.score.hit(params["q"].strip())
 
         return results
 
