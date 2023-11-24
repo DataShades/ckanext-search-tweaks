@@ -29,7 +29,7 @@ def search_tweaks_query_popularity_export(
     score = Score()
 
     results = score.export()
-    return {"results": results, "count": len(results)}
+    return {"snapshot": results}
 
 
 @validate(schema.query_popularity_import)
