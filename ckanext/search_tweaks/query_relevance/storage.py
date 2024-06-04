@@ -1,10 +1,11 @@
 from __future__ import annotations
-from abc import ABC, abstractclassmethod, abstractmethod
+
+from abc import ABC, abstractmethod
 from datetime import date, timedelta
-from typing import Any, Iterable, cast, Tuple
+from typing import Any, Iterable, Tuple, cast
 
 import ckan.plugins.toolkit as tk
-from ckan.lib.redis import connect_to_redis, Redis
+from ckan.lib.redis import Redis, connect_to_redis
 
 CONFIG_DAILY_AGE = "ckanext.search_tweaks.query_relevance.daily.age"
 DEFAULT_DAILY_AGE = 90
@@ -36,13 +37,13 @@ class ScoreStorage(ABC):
         ...
 
     @classmethod
-    @abstractclassmethod
+    @abstractmethod
     def scan(cls, id_: str | None = None) -> Iterable[ScanItem]:
         """Get all the scores."""
         ...
 
     @classmethod
-    @abstractclassmethod
+    @abstractmethod
     def reset_storage(cls):
         """Remove everything from storage."""
         ...
@@ -53,6 +54,7 @@ class ScoreStorage(ABC):
 
     def align(self) -> None:
         """Make some cleanup in order to maintain fast and correct value."""
+        return
 
 
 class RedisScoreStorage(ScoreStorage):
@@ -80,8 +82,7 @@ class RedisScoreStorage(ScoreStorage):
             conn.delete(key)
 
     @abstractmethod
-    def _key(self) -> str:
-        ...
+    def _key(self) -> str: ...
 
     def reset(self):
         self.conn.delete(self._key())
@@ -135,8 +136,7 @@ class DailyRedisScoreStorage(RedisScoreStorage):
     def get(self) -> int:
         key = self._key()
         values = self.conn.zrange(key, 0, -1, withscores=True)
-        total = self._total(values)
-        return total
+        return self._total(values)
 
     @staticmethod
     def _total(values: list[tuple[Any, Any]]) -> int:

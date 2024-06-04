@@ -5,8 +5,9 @@ from typing import Any
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 
-from ckanext.search_tweaks import feature_disabled
 from ckanext.search_tweaks.interfaces import ISearchTweaks
+from ckanext.search_tweaks.shared import feature_disabled
+
 from . import views
 
 CONFIG_BOOST_FN = "ckanext.search_tweaks.field_relevance.boost_function"

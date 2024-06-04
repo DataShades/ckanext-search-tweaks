@@ -1,13 +1,10 @@
 from __future__ import annotations
-from collections import defaultdict
-from datetime import datetime, timedelta
+
 import logging
-from hashlib import md5
-from typing import Any, Iterable, cast
-from operator import itemgetter
-import ckan.plugins.toolkit as tk
-from redis import Redis
+from typing import Any, Iterable
+
 from ckanext.toolbelt.utils.tracking import DateTracker
+
 from . import config
 
 log = logging.getLogger(__name__)

@@ -72,10 +72,10 @@ class AdvancedSearchPlugin(p.SingletonPlugin):
     def configure(self, config):
         try:
             from ckanext.composite_search.interfaces import ICompositeSearch
-        except ImportError:
-            raise CkanConfigurationException(
-                "ckanext-composite-search is not installed",
-            )
+        except ImportError as err:
+            msg = "ckanext-composite-search is not installed"
+            raise CkanConfigurationException(msg) from err
+
         if not p.plugin_loaded("composite_search"):
             msg = "Advanced search requires `composite_search` plugin"
             raise CkanConfigurationException(msg)

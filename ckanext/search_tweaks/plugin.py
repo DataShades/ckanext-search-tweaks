@@ -5,8 +5,10 @@ from typing import Any
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
-from . import feature_disabled, config
+
+from . import config
 from .interfaces import ISearchTweaks
+from .shared import feature_disabled
 
 log = logging.getLogger(__name__)
 CONFIG_PREFER_BOOST = "ckanext.search_tweaks.common.prefer_boost"
@@ -74,10 +76,7 @@ def _set_qf(search_params: dict[str, Any]) -> None:
 
 
 def _set_fuzzy(search_params: dict[str, Any]) -> None:
-    if not config.fuzzy():
-        return
-
-    if feature_disabled("fuzzy", search_params):
+    if not config.fuzzy() or feature_disabled("fuzzy", search_params):
         return
 
     distance = _get_fuzzy_distance()
@@ -93,9 +92,9 @@ def _set_fuzzy(search_params: dict[str, Any]) -> None:
 
     fuzzy_q = " ".join(
         map(
-            lambda s: f"{s}~{distance}"
-            if s.isalpha() and s not in ("AND", "OR", "TO")
-            else s,
+            lambda s: (
+                f"{s}~{distance}" if s.isalpha() and s not in ("AND", "OR", "TO") else s
+            ),
             q.split(),
         ),
     )

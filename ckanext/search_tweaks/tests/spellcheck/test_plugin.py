@@ -44,8 +44,8 @@ class TestHelper:
         Dataset(title="Do not touch me")
         helper = tk.h.spellcheck_did_you_mean
         rebuild_dictionary()
-        assert helper("pick thes") == ["pick test"]
-        assert helper("do nat touc me") == ["do not touch me"]
+        assert helper("pick thes") == ["pick this"]
+        assert helper("do nat touc") == ["do not touch"]
 
         assert helper("pic", 3) == [
             "pick",

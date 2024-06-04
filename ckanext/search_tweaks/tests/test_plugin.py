@@ -3,7 +3,6 @@ import pytest
 import ckan.lib.search.query as query
 import ckan.plugins as p
 
-import ckanext.search_tweaks.plugin as plugin
 import ckanext.search_tweaks.config as config
 from ckanext.search_tweaks.config import CONFIG_PREFER_BOOST
 
@@ -76,7 +75,11 @@ class TestFuzzy:
     @pytest.mark.ckan_config(config.CONFIG_FUZZY, True)
     @pytest.mark.parametrize("distance", [-10, -1, 0])
     def test_fuzzy_enabled_with_too_low_distance(
-        self, search, distance, ckan_config, monkeypatch,
+        self,
+        search,
+        distance,
+        ckan_config,
+        monkeypatch,
     ):
         monkeypatch.setitem(ckan_config, config.CONFIG_FUZZY_DISTANCE, distance)
         assert search(q="")["q"] == "*:*"
@@ -89,7 +92,11 @@ class TestFuzzy:
     @pytest.mark.ckan_config(config.CONFIG_FUZZY, True)
     @pytest.mark.parametrize("distance", [3, 20, 111])
     def test_fuzzy_enabled_with_too_high_distance(
-        self, search, distance, ckan_config, monkeypatch,
+        self,
+        search,
+        distance,
+        ckan_config,
+        monkeypatch,
     ):
         monkeypatch.setitem(ckan_config, config.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"
@@ -101,7 +108,11 @@ class TestFuzzy:
     @pytest.mark.ckan_config(config.CONFIG_FUZZY, True)
     @pytest.mark.parametrize("distance", [1, 2])
     def test_fuzzy_keep_original_query(
-        self, search, distance, ckan_config, monkeypatch,
+        self,
+        search,
+        distance,
+        ckan_config,
+        monkeypatch,
     ):
         monkeypatch.setitem(ckan_config, config.CONFIG_FUZZY_DISTANCE, distance)
         assert search()["q"] == "*:*"

@@ -24,7 +24,9 @@ def get_helpers():
 
 
 def spellcheck_did_you_mean(
-    q: str, min_hits: int = 0, max_suggestions: int = None,
+    q: str,
+    min_hits: int = 0,
+    max_suggestions: int = None,
 ) -> list[str]:
     """Return optimal query that can be used instead of the current one.
 
@@ -71,7 +73,11 @@ def spellcheck_did_you_mean(
 
         # TODO: check min hits
         new_q = " ".join(
-            [spellcheck.suggestions[w][0] for w in terms if w in spellcheck.suggestions],
+            [
+                spellcheck.suggestions[w][0]
+                for w in terms
+                if w in spellcheck.suggestions
+            ],
         )
         if new_q:
             collations.append(new_q)

@@ -6,9 +6,10 @@ from typing import Any
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as tk
 
-from ckanext.search_tweaks import feature_disabled
 from ckanext.search_tweaks.cli import attach_relevance_command
 from ckanext.search_tweaks.interfaces import ISearchTweaks
+from ckanext.search_tweaks.shared import feature_disabled
+
 from . import QueryScore, cli, normalize_query, update_score_by_url
 
 CONFIG_BOOST_STRING = "ckanext.search_tweaks.query_relevance.boost_function"

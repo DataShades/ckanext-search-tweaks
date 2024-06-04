@@ -4,6 +4,8 @@
 
 [tool.ruff]
 target-version = "py38"
+
+[tool.ruff.lint]
 select = [
        "B",  # likely bugs and design problems
        "BLE",  # do not catch blind exception
@@ -34,11 +36,8 @@ ignore = [
        # "PLC1901", # simplify comparison to empty string: violated by SQLAlchemy filters
 ]
 
-[tool.ruff.per-file-ignores]
-"ckanext/search-tweaks/tests*" = [
-                         "S",  # security testing
-                         "PLR2004" # magic value used in comparison
-]
+[tool.ruff.lint.per-file-ignores]
+"ckanext/search_tweaks/tests*" = ["S", "PL"]
 
 [tool.isort]
 known_ckan = "ckan"

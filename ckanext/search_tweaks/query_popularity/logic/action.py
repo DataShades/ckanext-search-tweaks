@@ -1,16 +1,20 @@
 from __future__ import annotations
+
 from typing import Any
+
+import ckan.plugins.toolkit as tk
 from ckan import types
 from ckan.logic import validate
-import ckan.plugins.toolkit as tk
 
 from ckanext.search_tweaks.query_popularity.score import Score
+
 from . import schema
 
 
 @tk.side_effect_free
 def search_tweaks_query_popularity_list(
-    context: types.Context, data_dict: dict[str, Any]
+    context: types.Context,
+    data_dict: dict[str, Any],
 ) -> list[dict[str, Any]]:
     score = Score()
 
@@ -24,7 +28,8 @@ def search_tweaks_query_popularity_list(
 
 @tk.side_effect_free
 def search_tweaks_query_popularity_export(
-    context: types.Context, data_dict: dict[str, Any]
+    context: types.Context,
+    data_dict: dict[str, Any],
 ) -> list[Any]:
     score = Score()
 
@@ -33,7 +38,8 @@ def search_tweaks_query_popularity_export(
 
 @validate(schema.query_popularity_import)
 def search_tweaks_query_popularity_import(
-    context: types.Context, data_dict: dict[str, Any]
+    context: types.Context,
+    data_dict: dict[str, Any],
 ) -> dict[str, Any]:
     tk.check_access("sysadmin", context, data_dict)
     score = Score()
@@ -46,7 +52,8 @@ def search_tweaks_query_popularity_import(
 
 
 def search_tweaks_query_popularity_ignore(
-    context: types.Context, data_dict: dict[str, Any]
+    context: types.Context,
+    data_dict: dict[str, Any],
 ):
     q = tk.get_or_bust(data_dict, "q")
     score = Score()
