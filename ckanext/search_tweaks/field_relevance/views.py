@@ -27,16 +27,6 @@ DEFAULT_PROMOTION_FIELD = "promotion_level"
 field_relevance = Blueprint("search_tweaks_field_relevance", __name__)
 
 
-def get_blueprints():
-    if tk.asbool(
-        tk.config.get(CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE),
-    ):
-        path = tk.config.get(CONFIG_PROMOTION_PATH, DEFAULT_PROMOTION_PATH)
-        field_relevance.add_url_rule(path, view_func=PromoteView.as_view("promote"))
-
-    return [field_relevance]
-
-
 class PromoteView(MethodView):
     def _check_access(self, id: str) -> None:
         try:
@@ -96,3 +86,9 @@ class PromoteView(MethodView):
         }
 
         return tk.render("search_tweaks/field_relevance/promote.html", extra_vars)
+
+
+if tk.asbool(
+    tk.config.get(CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE),
+):
+    field_relevance.add_url_rule("/dataset/promote/<id>", view_func=PromoteView.as_view("promote"))

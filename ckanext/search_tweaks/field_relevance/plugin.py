@@ -15,10 +15,10 @@ CONFIG_BOOST_FN = "ckanext.search_tweaks.field_relevance.boost_function"
 DEFAULT_BOOST_FN = None
 
 
+@tk.blanket.blueprints
 class FieldRelevancePlugin(p.SingletonPlugin):
     p.implements(ISearchTweaks, inherit=True)
     p.implements(p.IAuthFunctions)
-    p.implements(p.IBlueprint)
     p.implements(p.IConfigurer, inherit=True)
 
     # ISearchTweaks
@@ -27,11 +27,6 @@ class FieldRelevancePlugin(p.SingletonPlugin):
             return None
 
         return tk.config.get(CONFIG_BOOST_FN, DEFAULT_BOOST_FN)
-
-    # IBlueprint
-
-    def get_blueprint(self):
-        return views.get_blueprints()
 
     # IConfigurer
 
