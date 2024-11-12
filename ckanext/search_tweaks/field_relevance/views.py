@@ -12,6 +12,9 @@ CONFIG_ENABLE_PROMOTION_ROUTE = (
     "ckanext.search_tweaks.field_relevance.blueprint.promotion.enabled"
 )
 CONFIG_PROMOTION_PATH = "ckanext.search_tweaks.field_relevance.blueprint.promotion.path"
+CONFIG_MIN_PROMOTION = (
+    "ckanext.search_tweaks.field_relevance.blueprint.promotion.min_value"
+)
 CONFIG_MAX_PROMOTION = (
     "ckanext.search_tweaks.field_relevance.blueprint.promotion.max_value"
 )
@@ -21,6 +24,7 @@ CONFIG_PROMOTION_FIELD = (
 
 DEFAULT_ENABLE_PROMOTION_ROUTE = False
 DEFAULT_PROMOTION_PATH = "/dataset/promote/<id>"
+DEFAULT_MIN_PROMOTION = 0
 DEFAULT_MAX_PROMOTION = 100
 DEFAULT_PROMOTION_FIELD = "promotion_level"
 
@@ -40,7 +44,7 @@ class PromoteView(MethodView):
         schema = {
             field: [
                 tk.get_validator("convert_int"),
-                tk.get_validator("natural_number_validator"),
+                tk.get_validator("int_validator"),
                 tk.get_validator("limit_to_configured_maximum")(
                     CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION,
                 ),
@@ -79,6 +83,10 @@ class PromoteView(MethodView):
             "pkg_dict": pkg_dict,
             "errors": errors or {},
             "data": data or pkg_dict,
+            "min_promotion": tk.asint(
+                tk.config.get(CONFIG_MIN_PROMOTION, DEFAULT_MIN_PROMOTION),
+            ),
+
             "max_promotion": tk.asint(
                 tk.config.get(CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION),
             ),
