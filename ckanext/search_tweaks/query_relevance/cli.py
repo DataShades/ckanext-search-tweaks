@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 import csv
 import datetime
-
+import logging
 import click
 import freezegun
 
 import ckan.model as model
 from ckan.lib.redis import connect_to_redis
+from ckan.lib.search import rebuild
 
 from . import QueryScore
 
 _search_csv_headers = ["package_id", "search_query", "count_of_hits"]
+
+log = logging.getLogger(__name__)
 
 
 @click.group(short_help="Manage search relevance")
@@ -86,3 +91,18 @@ def safe_export(ctx, days, file):
             fg="red",
         )
         ctx.invoke(import_source, source=click.File()(file))
+
+
+@query.command()
+def index():
+    """Re-index datasets that have query relevance scores.
+    """
+
+    storage = QueryScore.default_storage_class()
+    ids = {id for id, _, _ in storage.scan()}
+    with click.progressbar(ids) as bar:
+        for id in bar:
+            try:
+                rebuild(id)
+            except Exception:
+                log.exception("Cannot index %s", id)

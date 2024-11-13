@@ -49,24 +49,14 @@ class QueryRelevancePlugin(plugins.SingletonPlugin):
     # ISearchTweaks
 
     def get_search_boost_fn(self, search_params: dict[str, Any]) -> str | None:
-        if feature_disabled("query_boost", search_params):
-            return None
-
-        prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
-        disabled = tk.asbool(
-            search_params.get("extras", {}).get(
-                "ext_search_tweaks_disable_relevance",
-                False,
-            ),
-        )
-
-        if not search_params.get("q") or disabled:
+        if feature_disabled("query_boost", search_params) or not search_params.get("q"):
             return None
 
         normalized = normalize_query(search_params["q"]).replace(" ", "_")
         if not normalized:
             return None
 
+        prefix = tk.config.get(CONFIG_RELEVANCE_PREFIX, DEFAULT_RELEVANCE_PREFIX)
         field = prefix + normalized
         boost_string = Template(
             tk.config.get(CONFIG_BOOST_STRING, DEFAULT_BOOST_STRING),
