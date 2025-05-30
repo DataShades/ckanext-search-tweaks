@@ -40,6 +40,7 @@ solr_syntax_blank - open SOLR syntax article in the new tab
     <input type="text" class="form-control input-lg"
 	   name="q" value="{{ query }}" autocomplete="off"
 	   placeholder="{{ placeholder }}">
+	   aria-label="Search data">
     {{ search_button }}
 </div>
 {% endset %}
@@ -50,7 +51,8 @@ solr_syntax_blank - open SOLR syntax article in the new tab
     <input type="text" class="form-control input-lg"
 	   value="{{ request.args.ext_solr_q }}" autocomplete="off"
 	   name="ext_solr_q" disabled
-	   placeholder="{{ labels.solr_placeholder or _('metadata_created:[NOW/YEAR TO *] -tags:Health') }}" >
+	   placeholder="{{ labels.solr_placeholder or _('metadata_created:[NOW/YEAR TO *] -tags:Health') }}"
+	   aria-label="Search using Solr query">
     {{ search_button }}
 </div>
 {% endset %}
@@ -95,7 +97,7 @@ solr_syntax_blank - open SOLR syntax article in the new tab
 					{{ labels.solr_toggle or _('Add query syntax to search') }}
 					</label>
 					{% block solr_syntax_url %}
-						<a {% if solr_syntax_blank %}target="_blank"{% endif %} href="{{ solr_syntax_url }}">
+						<a {% if solr_syntax_blank %}target="_blank"{% endif %} href="{{ solr_syntax_url }}" aria-label="Learn more about SOLR query parameters">
 						<i class="fa fa-info-circle" data-placement="top" data-toggle="tooltip"
 						title="{{ labels.solr_explanation or _('This adds SOLR query language, for more information on how to use click here') }}"></i>
 						</a>
