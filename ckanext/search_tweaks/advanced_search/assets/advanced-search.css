@@ -24,7 +24,3 @@
 .search-tweaks-advanced-search.enabled.use-solr-query .advanced-search-submit {
   display: none;
 }
-
-.advanced-toggles label:after {
-  content: none;
-}
