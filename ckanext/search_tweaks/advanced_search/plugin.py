@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from ckan import types
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
 from ckan.exceptions import CkanConfigurationException
@@ -55,6 +56,15 @@ def form_config():
     }
 
 
+@tk.side_effect_free
+def advanced_search_config(
+    context: types.Context, data_dict: dict[str, Any]
+) -> dict[str, Any]:
+    """Configuration for advanced search fields."""
+    return tk.h.advanced_search_form_config()
+
+
+@tk.blanket.actions({"advanced_search_config": advanced_search_config})
 class AdvancedSearchPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IConfigurable)
