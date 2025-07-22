@@ -58,7 +58,8 @@ def form_config():
 
 @tk.side_effect_free
 def advanced_search_config(
-    context: types.Context, data_dict: dict[str, Any]
+    context: types.Context,
+    data_dict: dict[str, Any],
 ) -> dict[str, Any]:
     """Configuration for advanced search fields."""
     return tk.h.advanced_search_form_config()

@@ -1,20 +1,14 @@
-from typing import Optional, Type
-import ckan.plugins.toolkit as tk
 from .storage import (
     PermanentRedisScoreStorage,
     DailyRedisScoreStorage,
     ScoreStorage,
 )
+from .config import get_store_backend
 
-_backends = {
+_store_backends = {
     "redis-permanent": PermanentRedisScoreStorage,
     "redis-daily": DailyRedisScoreStorage,
 }
-
-CONFIG_BACKEND = "ckanext.search_tweaks.query_relevance.backend"
-DEFAULT_BACKEND = "redis-daily"
-
-DEFAULT_SCORE_STORAGE_CLASS = DailyRedisScoreStorage
 
 
 def normalize_query(query: str) -> str:
@@ -26,7 +20,7 @@ def normalize_query(query: str) -> str:
 
 
 class QueryScore:
-    storage_class: Type[ScoreStorage]
+    storage_class: type[ScoreStorage]
 
     def __init__(
         self,
@@ -34,7 +28,7 @@ class QueryScore:
         query: str,
         *,
         normalize: bool = True,
-        storage_class: Optional[Type[ScoreStorage]] = None,
+        storage_class: type[ScoreStorage] | None = None,
     ):
         if normalize:
             query = normalize_query(query)
@@ -49,8 +43,8 @@ class QueryScore:
         return self.storage.get()
 
     @staticmethod
-    def default_storage_class() -> Type[ScoreStorage]:
-        return _backends[tk.config.get(CONFIG_BACKEND, DEFAULT_BACKEND)]
+    def default_storage_class() -> type[ScoreStorage]:
+        return _store_backends[get_store_backend()]
 
     @property
     def query(self):
@@ -71,5 +65,6 @@ class QueryScore:
         return storage.scan()
 
     @classmethod
-    def get_for(cls, id_: str):
-        return cls.default_storage_class().scan(id_)
+    def get_for_query(cls, query: str):
+        storage = cls.default_storage_class()
+        return storage.scan(query)

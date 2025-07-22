@@ -30,6 +30,7 @@ class TestDidYouMeanSnippet:
         snippet = BeautifulSoup(tk.render("search_tweaks/did_you_mean.html"))
         helper.assert_called()
         link = snippet.select_one("a")
+        assert link
         assert link.text.strip() == expected
         assert "q=" + expected in link["href"]
 
@@ -49,7 +50,7 @@ class TestHelper:
 
         assert helper("pic", 3) == [
             "pick",
-        ]  # min_hits fucked up because of single-term match
+        ]  # min_hits messed up because of single-term match
         assert helper("pic", 1) == ["pick"]
 
     def test_show_only_more_results(self, ckan_config, monkeypatch):
@@ -62,7 +63,7 @@ class TestHelper:
         assert helper("pock", 1) == ["pick"]
         assert helper("pick", 3) == [
             "pock",
-        ]  # min_hits fucked up because of single-term match
+        ]  # min_hits messed up because of single-term match
 
         monkeypatch.setitem(ckan_config, CONFIG_SHOW_ONLY_MORE, "off")
         assert helper("pock", 1) == ["pick"]

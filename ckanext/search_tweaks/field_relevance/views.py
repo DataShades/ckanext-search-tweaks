@@ -5,6 +5,7 @@ from typing import Any
 from flask import Blueprint
 from flask.views import MethodView
 
+import ckan.types as types
 import ckan.model as model
 import ckan.plugins.toolkit as tk
 
@@ -46,7 +47,8 @@ class PromoteView(MethodView):
                 tk.get_validator("convert_int"),
                 tk.get_validator("int_validator"),
                 tk.get_validator("limit_to_configured_maximum")(
-                    CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION,
+                    CONFIG_MAX_PROMOTION,
+                    DEFAULT_MAX_PROMOTION,
                 ),
             ],
         }
@@ -54,14 +56,15 @@ class PromoteView(MethodView):
         data, errors = tk.navl_validate(
             dict(tk.request.form),
             schema,
-            {"model": model, "session": model.Session},
+            types.Context(model=model, session=model.Session),  # type: ignore
         )
 
         if errors:
             return self.get(id, data, errors)
         try:
             pkg_dict = tk.get_action("package_patch")(
-                {}, {"id": id, field: data[field]},
+                {},
+                {"id": id, field: data[field]},
             )
         except tk.ValidationError as e:
             for k, v in e.error_summary.items():
@@ -86,7 +89,6 @@ class PromoteView(MethodView):
             "min_promotion": tk.asint(
                 tk.config.get(CONFIG_MIN_PROMOTION, DEFAULT_MIN_PROMOTION),
             ),
-
             "max_promotion": tk.asint(
                 tk.config.get(CONFIG_MAX_PROMOTION, DEFAULT_MAX_PROMOTION),
             ),
@@ -99,4 +101,7 @@ class PromoteView(MethodView):
 if tk.asbool(
     tk.config.get(CONFIG_ENABLE_PROMOTION_ROUTE, DEFAULT_ENABLE_PROMOTION_ROUTE),
 ):
-    field_relevance.add_url_rule("/dataset/promote/<id>", view_func=PromoteView.as_view("promote"))
+    field_relevance.add_url_rule(
+        "/dataset/promote/<id>",
+        view_func=PromoteView.as_view("promote"),
+    )

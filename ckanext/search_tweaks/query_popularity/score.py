@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from ckanext.toolbelt.utils.tracking import DateTracker
 

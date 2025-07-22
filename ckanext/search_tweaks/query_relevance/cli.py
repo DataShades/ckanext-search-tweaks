@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TextIO
+
 import csv
 import datetime
 import logging
@@ -8,7 +10,6 @@ import freezegun
 
 import ckan.model as model
 from ckan.lib.redis import connect_to_redis
-from ckan.lib.search import rebuild
 
 from . import QueryScore
 
@@ -25,35 +26,41 @@ def query():
 @query.command("import")
 @click.argument("source", type=click.File())
 @click.option("--date", type=datetime.date.fromisoformat)
-def import_source(source, date):
+def import_source(source: TextIO, date):
     """Import search stats from source"""
     if not date:
         date = datetime.date.today()
+
     with freezegun.freeze_time(date):
         reader = csv.DictReader(source)
         for row in reader:
             pkg = model.Package.get(row["package_id"])
+
             if not pkg:
                 click.secho(f"Package {row['package_id']} does not exists", fg="red")
                 continue
+
             score = QueryScore(pkg.id, row["search_query"])
             score.reset()
             score.increase(int(row["count_of_hits"]))
+
     click.secho("Done", fg="green")
 
 
 @query.command()
 @click.argument("output", type=click.File("w"), required=False)
-def export(output):
+def export(output: TextIO | None):
     """Export search stats into specified file."""
     rows = QueryScore.get_all()
+
     if output:
         writer = csv.writer(output)
         writer.writerow(_search_csv_headers)
         writer.writerows(rows)
     else:
         for row in rows:
-            click.echo("Id: %s, query: %s, count: %d" % row)
+            click.echo("Id: {}, query: {}, count: {}".format(*row))
+
     click.secho("Done", fg="green")
 
 
@@ -81,7 +88,8 @@ def safe_export(ctx, days, file):
 
     """
     conn = connect_to_redis()
-    uptime = conn.info()["uptime_in_days"]
+    uptime = conn.info()["uptime_in_days"]  # type: ignore
+
     if uptime >= days:
         click.secho(f"Redis runs for {uptime} days. Creating snapshot..", fg="green")
         ctx.invoke(export, output=click.File("w")(file))
@@ -91,18 +99,3 @@ def safe_export(ctx, days, file):
             fg="red",
         )
         ctx.invoke(import_source, source=click.File()(file))
-
-
-@query.command()
-def index():
-    """Re-index datasets that have query relevance scores.
-    """
-
-    storage = QueryScore.default_storage_class()
-    ids = {id for id, _, _ in storage.scan()}
-    with click.progressbar(ids) as bar:
-        for id in bar:
-            try:
-                rebuild(id)
-            except Exception:
-                log.exception("Cannot index %s", id)

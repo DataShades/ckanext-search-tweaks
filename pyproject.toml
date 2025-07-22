@@ -1,21 +1,29 @@
 [build-system]
-requires = [ "setuptools",]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ckanext-search-tweaks"
-version = "0.6.5"
+version = "0.7.0"
 description = ""
-classifiers = [ "Development Status :: 4 - Beta", "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)", "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", "Programming Language :: Python :: 3.10",]
-keywords = [ "CKAN",]
-dependencies = [ "freezegun", "typing_extensions>=4.0.0", "ckanext-toolbelt>=0.4.11",]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = ["CKAN"]
+dependencies = [
+    "freezegun",
+    "typing_extensions>=4.0.0",
+    "ckanext-toolbelt>=0.6.6",
+]
 authors = [
-    {name = "DataShades", email = "datashades@linkdigital.com.au"},
-    {name = "Sergey Motornyuk", email = "sergey.motornyuk@linkdigital.com.au"},
+    { name = "DataShades", email = "datashades@linkdigital.com.au" },
+    { name = "Sergey Motornyuk", email = "sergey.motornyuk@linkdigital.com.au" },
 ]
-maintainers = [
-    {name = "DataShades", email = "datashades@linkdigital.com.au"},
-]
+maintainers = [{ name = "DataShades", email = "datashades@linkdigital.com.au" }]
 
 [project.readme]
 file = "README.md"
@@ -49,37 +57,37 @@ find = {}
 # preview = true
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
-       "B",  # likely bugs and design problems
-       "BLE",  # do not catch blind exception
-       "C40",  # better list/set/dict comprehensions
-       "C90",  # check McCabe complexity
-       "COM",  # trailing commas
-       "E",  # pycodestyle error
-       "W",  # pycodestyle warning
-       "F",  # pyflakes
-       "G",  # format strings for logging statements
-       "N",  # naming conventions
-       # "PL",  # pylint
-       # "PT",  # pytest style
-       "PIE",  # misc lints
-       "Q",  # preferred quoting style
-       "RET",  # improvements for return statements
-       "RSE",  # improvements for rise statements
-       "S",  # security testing
-       "SIM",  # simplify code
-       "T10",  # debugging statements
-       "T20",  # print statements
-       "TID",  # tidier imports
-       "TRY",  # better exceptions
-       "UP",  # upgrade syntax for newer versions of the language
+    "B",   # likely bugs and design problems
+    "BLE", # do not catch blind exception
+    "C40", # better list/set/dict comprehensions
+    "C90", # check McCabe complexity
+    "COM", # trailing commas
+    "E",   # pycodestyle error
+    "W",   # pycodestyle warning
+    "F",   # pyflakes
+    "G",   # format strings for logging statements
+    "N",   # naming conventions
+    # "PL",  # pylint
+    # "PT",  # pytest style
+    "PIE", # misc lints
+    "Q",   # preferred quoting style
+    "RET", # improvements for return statements
+    "RSE", # improvements for rise statements
+    "S",   # security testing
+    "SIM", # simplify code
+    "T10", # debugging statements
+    "T20", # print statements
+    "TID", # tidier imports
+    "TRY", # better exceptions
+    "UP",  # upgrade syntax for newer versions of the language
 ]
 ignore = [
-       # "PT004", # fixture does not return anything, add leading underscore: violated by clean_db
-       # "PLC1901", # simplify comparison to empty string: violated by SQLAlchemy filters
+    # "PT004", # fixture does not return anything, add leading underscore: violated by clean_db
+    # "PLC1901", # simplify comparison to empty string: violated by SQLAlchemy filters
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -95,25 +103,22 @@ profile = "black"
 [tool.pytest.ini_options]
 addopts = "--ckan-ini test.ini"
 filterwarnings = [
-               "ignore::sqlalchemy.exc.SADeprecationWarning",
-               "ignore::sqlalchemy.exc.SAWarning",
-               "ignore::DeprecationWarning",
+    "ignore::sqlalchemy.exc.SADeprecationWarning",
+    "ignore::sqlalchemy.exc.SAWarning",
+    "ignore::DeprecationWarning",
 ]
 
 [tool.pyright]
-pythonVersion = "3.8"
+pythonVersion = "3.10"
 include = ["ckanext"]
-exclude = [
-    "**/test*",
-    "**/migration",
-]
+exclude = ["**/test*", "**/migration"]
 strict = []
 
 strictParameterNoneValue = true
 
 # Check the meaning of rules here
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-reportFunctionMemberAccess = true # non-standard member accesses for functions
+reportFunctionMemberAccess = true          # non-standard member accesses for functions
 reportMissingImports = true
 reportMissingModuleSource = true
 reportMissingTypeStubs = false
@@ -129,7 +134,7 @@ reportOptionalCall = true
 reportOptionalIterable = true
 reportOptionalContextManager = true
 reportOptionalOperand = true
-reportTypedDictNotRequiredAccess = false # Context won't work with this rule
+reportTypedDictNotRequiredAccess = false   # Context won't work with this rule
 reportConstantRedefinition = true
 reportIncompatibleMethodOverride = true
 reportIncompatibleVariableOverride = true
@@ -149,7 +154,7 @@ reportUnnecessaryCast = true
 reportUnnecessaryComparison = true
 reportAssertAlwaysTrue = true
 reportSelfClsParameterName = true
-reportUnusedCallResult = false # allow function calls for side-effect only
+reportUnusedCallResult = false             # allow function calls for side-effect only
 useLibraryCodeForTypes = true
 reportGeneralTypeIssues = true
 reportPropertyTypeMismatch = true

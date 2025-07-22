@@ -33,7 +33,6 @@ class SearchTweaksPlugin(plugins.SingletonPlugin):
 
         if config.prefer_boost() and search_params["defType"] == "edismax":
             _set_boost(search_params)
-
         else:
             _set_bf(search_params)
 

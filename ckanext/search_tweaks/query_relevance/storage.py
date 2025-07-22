@@ -2,15 +2,18 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import date, timedelta
-from typing import Any, Iterable, Tuple, cast
+from typing import Any, cast
+from collections.abc import Iterable
 
 import ckan.plugins.toolkit as tk
 from ckan.lib.redis import Redis, connect_to_redis
 
+from .config import get_daily_age
+
 CONFIG_DAILY_AGE = "ckanext.search_tweaks.query_relevance.daily.age"
 DEFAULT_DAILY_AGE = 90
 
-ScanItem = Tuple[str, str, int]
+ScanItem = tuple[str, str, int]
 
 
 class ScoreStorage(ABC):
@@ -73,12 +76,12 @@ class RedisScoreStorage(ScoreStorage):
     @staticmethod
     def _common_key_part() -> str:
         site_id = tk.config["ckan.site_id"]  # type: ignore
-        return f"{site_id}:land:query_scores"
+        return f"{site_id}:search_tweaks:query_scores"
 
     @classmethod
     def reset_storage(cls):
         conn = cls.connect()
-        for key in conn.keys(f"{cls._common_key_part()}:*"):
+        for key in conn.keys(f"{cls._common_key_part()}:*"):  # type: ignore
             conn.delete(key)
 
     @abstractmethod
@@ -97,10 +100,10 @@ class PermanentRedisScoreStorage(RedisScoreStorage):
     """
 
     def set(self, value: int) -> None:
-        self.conn.hset(self._key(), self.query, value)
+        self.conn.hset(self._key(), self.query, str(value))
 
     def get(self) -> int:
-        return int(self.conn.hget(self._key(), self.query) or 0)
+        return int(self.conn.hget(self._key(), self.query) or 0)  # type: ignore
 
     def inc(self, by: int) -> None:
         self.conn.hincrby(self._key(), self.query, by)
@@ -113,9 +116,9 @@ class PermanentRedisScoreStorage(RedisScoreStorage):
         conn = cls.connect()
         common_key = cls._common_key_part()
         pattern = f"{common_key}:{id_}" if id_ else f"{common_key}:*"
-        for key in conn.keys(pattern):
+        for key in conn.keys(pattern):  # type: ignore
             _, row_id = key.rsplit(b":", 1)
-            for query, score in conn.hgetall(key).items():
+            for query, score in conn.hgetall(key).items():  # type: ignore
                 yield row_id.decode(), query.decode(), int(score)
 
 
@@ -136,7 +139,7 @@ class DailyRedisScoreStorage(RedisScoreStorage):
     def get(self) -> int:
         key = self._key()
         values = self.conn.zrange(key, 0, -1, withscores=True)
-        return self._total(values)
+        return self._total(values)  # type: ignore
 
     @staticmethod
     def _total(values: list[tuple[Any, Any]]) -> int:
@@ -149,11 +152,12 @@ class DailyRedisScoreStorage(RedisScoreStorage):
         self.conn.zincrby(key, by, zkey)  # type: ignore
 
     def align(self):
-        age = tk.asint(tk.config.get(CONFIG_DAILY_AGE, DEFAULT_DAILY_AGE))
-        verge = bytes((date.today() - timedelta(days=age)).isoformat(), "utf8")
+        verge = bytes(
+            (date.today() - timedelta(days=get_daily_age())).isoformat(), "utf8"
+        )
         key = self._key()
 
-        for day in self.conn.zrange(key, 0, -1):
+        for day in self.conn.zrange(key, 0, -1):  # type: ignore
             if day >= verge:
                 continue
             self.conn.zrem(key, day)
@@ -166,9 +170,10 @@ class DailyRedisScoreStorage(RedisScoreStorage):
 
     @classmethod
     def scan(cls, id_: str | None = None) -> Iterable[ScanItem]:
-        conn = cls.connect()
         common_key = cls._common_key_part()
         pattern = f"{common_key}:{id_}:*" if id_ else f"{common_key}:*"
-        for key in conn.keys(pattern):
+
+        for key in cls.connect().keys(pattern):  # type: ignore
             _, id_, query = key.decode().rsplit(":", 2)
-            yield id_, query, cls(id_, query).get()
+
+            yield id_, query, cls(id_, query).get()  # type: ignore

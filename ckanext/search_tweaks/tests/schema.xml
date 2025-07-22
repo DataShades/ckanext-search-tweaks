@@ -174,7 +174,6 @@ attribute with the form `ckan-X.Y` -->
     <dynamicField name="vocab_*" type="string" indexed="true" stored="true" multiValued="true"/>
     <dynamicField name="*" type="string" indexed="true"  stored="false"/>
 
-    <dynamicField name="query_relevance_*"  type="int" indexed="true" stored="true"/>
     <field name="did_you_mean"  type="text_general" indexed="true" multiValued="true" />
 
 </fields>
