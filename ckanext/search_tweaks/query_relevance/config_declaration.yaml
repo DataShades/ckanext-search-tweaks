@@ -2,16 +2,6 @@ version: 1
 groups:
   - annotation: "ckanext-search-tweaks:query_relevance"
     options:
-      - key: ckanext.search_tweaks.query_relevance.backend
-        default: redis-daily
-        description: Backend to store information about dataset search relevance
-
-      - key: ckanext.search_tweaks.query_relevance.daily.age
-        default: 90
-        description: |
-          How long(in days) information about dataset visits will
-          be stored in order to update relevance of dataset in search query.
-
       - key: ckanext.search_tweaks.query_relevance.min_boost
         default: 1
         description: Minimum boost to apply to a query. Use float values

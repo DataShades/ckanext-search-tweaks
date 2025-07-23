@@ -104,7 +104,6 @@ ckanext.search_tweaks.common.mm = 2<-1 5<80%
 ckanext.search_tweaks.common.fuzzy_search.keep_original
 ```
 
-
 ---
 
 ### <a id="search_tweaks_query_relevance"></a> search_tweaks_query_relevance
@@ -113,40 +112,27 @@ Increase relevance of datasets for particular query depending on number of
 direct visits of the dataset after running this search. I.e, if user searches
 for `something` and then visits dataset **B** which is initially displayed in a
 third row of search results, eventually this dataset will be displayed on the
-second or even on the first row. This is implemented in three stages. On the
-first stage, statistics collected and stored inside storage(redis, by default)
-and then this statistics converted into numeric solr field via cronjob.
-Finally, Solr's boost function that scales number of visits and improves score
-for the given query is applied during search.
+second or even on the first row.
+
+This is implemented in two stages:
+- In the first stage, statistics are collected and stored in Redis.
+- During search, we apply Solr's boost function to scale the dataset score based on the number of visits.
 
 #### CLI
 
 ```
-relevance query align - remove old data from storage. Actual result of this command depends
-    on storage backend, that is controlled by config. At the momment, only `redis-daily` backend
-    is affected by this command - all records older than `query_relevance.daily.age` days are removed.
-
 relevance query export - export statistics as CSV.
 
 relevance query import - import statistics from CSV. Note, records that are already in storage but
     are not listed in CSV won't be removed. It must be done manually
+
+relevance query reset - reset all the query relevance scores
 ```
 
 
 #### Config settings
 
 ```ini
-# Which backend to use in order to collect information about dataset
-# relevance for the particular search query. Possible values are:
-# "redis-permanent", "redis-daily"
-# (optional, default: redis-daily).
-ckanext.search_tweaks.query_relevance.backend = redis-permanent
-
-# How long(in days) information about dataset visits will be stored in order to
-# update relevance of dataset in search query.
-# (optional, default: 90).
-ckanext.search_tweaks.query_relevance.daily.age = 90
-
 # Minimum boost to apply to a search query
 # (optional, default: 1).
 ckanext.search_tweaks.query_relevance.min_boost = 1
@@ -156,11 +142,12 @@ ckanext.search_tweaks.query_relevance.min_boost = 1
 ckanext.search_tweaks.query_relevance.max_boost = 2
 
 # Maximum number of boosts to apply to a search query
-# Set more to promote more datasets at once. Note, that a higher number of boosts
-# will increase the query time
+# Set more to promote more datasets at once. Note, that a higher
+# number of boosts may increase the query time.
 # (optional, default: 60).
 ckanext.search_tweaks.query_relevance.max_boost_count = 60
 ```
+
 ---
 ### <a id="search_tweaks_field_relevance"></a> search_tweaks_field_relevance
 

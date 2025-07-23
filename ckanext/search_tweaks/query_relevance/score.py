@@ -1,14 +1,5 @@
-from .storage import (
-    PermanentRedisScoreStorage,
-    DailyRedisScoreStorage,
-    ScoreStorage,
-)
-from .config import get_store_backend
-
-_store_backends = {
-    "redis-permanent": PermanentRedisScoreStorage,
-    "redis-daily": DailyRedisScoreStorage,
-}
+from .storage import QueryHitTracker
+from .config import get_max_boost_count
 
 
 def normalize_query(query: str) -> str:
@@ -20,51 +11,32 @@ def normalize_query(query: str) -> str:
 
 
 class QueryScore:
-    storage_class: type[ScoreStorage]
-
-    def __init__(
-        self,
-        id_: str,
-        query: str,
-        *,
-        normalize: bool = True,
-        storage_class: type[ScoreStorage] | None = None,
-    ):
+    def __init__(self, entity_id: str, query: str, normalize: bool = True):
         if normalize:
             query = normalize_query(query)
 
-        if storage_class:
-            self.storage_class = storage_class
-        else:
-            self.storage_class = self.default_storage_class()
-        self.storage = self.storage_class(id_, query)
+        self.entity_id = entity_id
+        self.query = query
+
+        self.storage = QueryHitTracker(self.entity_id, self.query)
 
     def __int__(self):
         return self.storage.get()
 
-    @staticmethod
-    def default_storage_class() -> type[ScoreStorage]:
-        return _store_backends[get_store_backend()]
-
-    @property
-    def query(self):
-        return self.storage.query
-
-    def increase(self, n: int) -> None:
-        self.storage.inc(n)
-
-    def align(self):
-        self.storage.align()
+    def increase(self, amount: int) -> None:
+        self.storage.increase(amount)
 
     def reset(self):
-        self.storage.reset()
+        self.storage.reset(self.query)
+
+    @classmethod
+    def get_for_query(cls, query: str, limit: int | None = None) -> list[tuple[bytes, float]]:
+        return QueryHitTracker.top(query, limit or get_max_boost_count())
 
     @classmethod
     def get_all(cls):
-        storage = cls.default_storage_class()
-        return storage.scan()
+        return QueryHitTracker.get_all()
 
     @classmethod
-    def get_for_query(cls, query: str):
-        storage = cls.default_storage_class()
-        return storage.scan(query)
+    def reset_all(cls):
+        return QueryHitTracker.reset_all()

@@ -63,17 +63,21 @@ class TestSearchScoreBoost:
 
     @pytest.mark.skip(reason="use only for profiling")
     def test_profile_boost_function(self, dataset_factory):
+        first_query = None
 
-        for i in range(1000):
-            dataset = dataset_factory(title=f"water basin {i}")
+        for _ in range(1000):
+            dataset = dataset_factory()
             ds_query = dataset["title"].split()[0]
+
+            if first_query is None:
+                first_query = ds_query
 
             QueryScore(dataset["id"], ds_query).increase(1)
 
         import timeit
 
         def time_query():
-            call_action("package_search", q="water", fl="id,title,score")
+            call_action("package_search", q=first_query, fl="id,title,score")
 
         time = timeit.timeit(time_query, number=20)
 
