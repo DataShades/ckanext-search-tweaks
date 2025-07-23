@@ -1,20 +1,5 @@
-from typing import Optional, Type
-import ckan.plugins.toolkit as tk
-from .storage import (
-    PermanentRedisScoreStorage,
-    DailyRedisScoreStorage,
-    ScoreStorage,
-)
-
-_backends = {
-    "redis-permanent": PermanentRedisScoreStorage,
-    "redis-daily": DailyRedisScoreStorage,
-}
-
-CONFIG_BACKEND = "ckanext.search_tweaks.query_relevance.backend"
-DEFAULT_BACKEND = "redis-daily"
-
-DEFAULT_SCORE_STORAGE_CLASS = DailyRedisScoreStorage
+from .storage import QueryHitTracker
+from .config import get_max_boost_count
 
 
 def normalize_query(query: str) -> str:
@@ -26,50 +11,32 @@ def normalize_query(query: str) -> str:
 
 
 class QueryScore:
-    storage_class: Type[ScoreStorage]
-
-    def __init__(
-        self,
-        id_: str,
-        query: str,
-        *,
-        normalize: bool = True,
-        storage_class: Optional[Type[ScoreStorage]] = None,
-    ):
+    def __init__(self, entity_id: str, query: str, normalize: bool = True):
         if normalize:
             query = normalize_query(query)
 
-        if storage_class:
-            self.storage_class = storage_class
-        else:
-            self.storage_class = self.default_storage_class()
-        self.storage = self.storage_class(id_, query)
+        self.entity_id = entity_id
+        self.query = query
+
+        self.storage = QueryHitTracker(self.entity_id, self.query)
 
     def __int__(self):
         return self.storage.get()
 
-    @staticmethod
-    def default_storage_class() -> Type[ScoreStorage]:
-        return _backends[tk.config.get(CONFIG_BACKEND, DEFAULT_BACKEND)]
-
-    @property
-    def query(self):
-        return self.storage.query
-
-    def increase(self, n: int) -> None:
-        self.storage.inc(n)
-
-    def align(self):
-        self.storage.align()
+    def increase(self, amount: int) -> None:
+        self.storage.increase(amount)
 
     def reset(self):
-        self.storage.reset()
+        self.storage.reset(self.query)
+
+    @classmethod
+    def get_for_query(cls, query: str, limit: int | None = None) -> list[tuple[bytes, float]]:
+        return QueryHitTracker.top(query, limit or get_max_boost_count())
 
     @classmethod
     def get_all(cls):
-        storage = cls.default_storage_class()
-        return storage.scan()
+        return QueryHitTracker.get_all()
 
     @classmethod
-    def get_for(cls, id_: str):
-        return cls.default_storage_class().scan(id_)
+    def reset_all(cls):
+        return QueryHitTracker.reset_all()

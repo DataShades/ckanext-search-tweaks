@@ -108,7 +108,7 @@ class Collation:
         self.hits = data["hits"]
         self.query = data["collationQuery"]
         changes = data["misspellingsAndCorrections"]
-        self.corrections = dict(zip(changes[::2], changes[1::2]))
+        self.corrections = dict(zip(changes[::2], changes[1::2], strict=True))
 
     def __eq__(self, other):
         if isinstance(other, int):
@@ -145,7 +145,11 @@ class SpellcheckResult:
     def __init__(self, collations: list[Any], suggestions: list[Any]):
         self.collations = [Collation(item) for item in collations[1::2]]
         self.suggestions = dict(
-            zip(suggestions[::2], [s["suggestion"] for s in suggestions[1::2]]),
+            zip(
+                suggestions[::2],
+                [s["suggestion"] for s in suggestions[1::2]],
+                strict=True,
+            ),
         )
 
     def best_collations(self, n: int | None = None) -> list[Collation]:

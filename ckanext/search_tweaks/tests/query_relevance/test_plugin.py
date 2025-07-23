@@ -5,7 +5,7 @@ import ckan.model as model
 import ckanext.search_tweaks.query_relevance as relevance
 
 
-@pytest.mark.usefixtures("with_request_context")
+@pytest.mark.usefixtures("clean_db", "with_request_context")
 class TestPathHasScore:
     @pytest.mark.parametrize(
         "path, has_score",
@@ -17,7 +17,7 @@ class TestPathHasScore:
     )
     def test_search_referrer(self, path, has_score):
         pkg = model.Package(type="dataset")
-        assert relevance._path_has_score_for(path, pkg) is has_score
+        assert relevance._is_scoring_enabled_for_path(path, pkg) is has_score
 
     @pytest.mark.parametrize(
         "path, has_score",
@@ -34,7 +34,7 @@ class TestPathHasScore:
             "get",
             lambda _: model.Group(name="valid", type="organization"),
         )
-        assert relevance._path_has_score_for(path, pkg) is has_score
+        assert relevance._is_scoring_enabled_for_path(path, pkg) is has_score
 
     @pytest.mark.parametrize(
         "path, has_score",
@@ -47,10 +47,10 @@ class TestPathHasScore:
     def test_group_referrer(self, path, has_score, monkeypatch):
         pkg = model.Package(type="dataset")
         monkeypatch.setattr(model.Group, "get", lambda _: model.Group(name="valid"))
-        assert relevance._path_has_score_for(path, pkg) is has_score
+        assert relevance._is_scoring_enabled_for_path(path, pkg) is has_score
 
 
-@pytest.mark.usefixtures("with_request_context")
+@pytest.mark.usefixtures("clean_db", "with_request_context")
 class TestUpdateScore:
     @pytest.mark.parametrize(
         "url, repeat, value",

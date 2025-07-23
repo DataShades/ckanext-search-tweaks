@@ -1,0 +1,16 @@
+version: 1
+groups:
+  - annotation: "ckanext-search-tweaks:query_relevance"
+    options:
+      - key: ckanext.search_tweaks.query_relevance.min_boost
+        default: 1
+        description: Minimum boost to apply to a query. Use float values
+
+      - key: ckanext.search_tweaks.query_relevance.max_boost
+        default: 1.5
+        description: Maximum boost to apply to a query. Use float values
+
+      - key: ckanext.search_tweaks.query_relevance.max_boost_count
+        type: int
+        default: 60
+        description: Maximum number of boosts to apply to a query

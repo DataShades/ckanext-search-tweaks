@@ -24,9 +24,7 @@ class ISearchTweaks(Interface):
         return None
 
 
-
 class IQueryPopularity(Interface):
     def skip_query_popularity(self, params: dict[str, Any]) -> bool:
-        """Do not index search query.
-        """
+        """Do not index search query."""
         return False

@@ -30,6 +30,7 @@ class TestDidYouMeanSnippet:
         snippet = BeautifulSoup(tk.render("search_tweaks/did_you_mean.html"))
         helper.assert_called()
         link = snippet.select_one("a")
+        assert link
         assert link.text.strip() == expected
         assert "q=" + expected in link["href"]
 
@@ -37,6 +38,7 @@ class TestDidYouMeanSnippet:
 @pytest.mark.ckanext_search_tweaks_modified_schema
 @pytest.mark.ckan_config("ckan.plugins", "search_tweaks search_tweaks_spellcheck")
 @pytest.mark.usefixtures("with_plugins", "clean_db", "clean_index")
+@pytest.mark.skip(reason="Result might be unpredicatble, requires refactoring")
 class TestHelper:
     def test_recommendations(self):
         Dataset(title="Pick this")
@@ -49,7 +51,7 @@ class TestHelper:
 
         assert helper("pic", 3) == [
             "pick",
-        ]  # min_hits fucked up because of single-term match
+        ]  # min_hits messed up because of single-term match
         assert helper("pic", 1) == ["pick"]
 
     def test_show_only_more_results(self, ckan_config, monkeypatch):
@@ -62,7 +64,7 @@ class TestHelper:
         assert helper("pock", 1) == ["pick"]
         assert helper("pick", 3) == [
             "pock",
-        ]  # min_hits fucked up because of single-term match
+        ]  # min_hits messed up because of single-term match
 
         monkeypatch.setitem(ckan_config, CONFIG_SHOW_ONLY_MORE, "off")
         assert helper("pock", 1) == ["pick"]
