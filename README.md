@@ -10,8 +10,8 @@ Compatibility with core CKAN versions:
 
 | CKAN version    | Compatible? |
 |-----------------|-------------|
-| 2.8 and earlier | no          |
-| 2.9+            | yes         |
+| 2.9 and earlier | no          |
+| 2.10+           | yes         |
 
 
 ## Installation
