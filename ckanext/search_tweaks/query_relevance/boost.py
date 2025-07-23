@@ -19,8 +19,6 @@ def build_boost_query_function(search_query: str) -> str | None:
     min_boost = get_min_boost()
     max_boost = get_max_boost()
 
-    boost_parts = []
-
     if prefer_boost():
         boost_expr = "1"
 
