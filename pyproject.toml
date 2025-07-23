@@ -36,7 +36,7 @@ text = "AGPL"
 Homepage = "https://github.com/DataShades/ckanext-search-tweaks"
 
 [project.optional-dependencies]
-advanced-search = []
+dev = ["pytest-ckan", "pytest-freezegun", "pytest-factoryboy"]
 
 [project.entry-points."ckan.plugins"]
 search_tweaks = "ckanext.search_tweaks.plugin:SearchTweaksPlugin"
