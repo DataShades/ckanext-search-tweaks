@@ -11,26 +11,15 @@ jobs:
   test:
     strategy:
       matrix:
-        include: #ckan-image see https://github.com/ckan/ckan-docker-base, ckan-version controls other image tags
-          - ckan-version: "2.11"
-            ckan-image: "2.11.3-py3.10"
-            experimental: false
-          - ckan-version: "2.10"
-            ckan-image: "2.10-py3.10"
-            experimental: false
-          - ckan-version: "master"
-            ckan-image: "master"
-            experimental: true  # master is unstable
+        ckan-version: ["2.12", "2.11", "2.10"]
       fail-fast: false
 
-    name: ${{ matrix.experimental && '**Fail_Ignored** ' || '' }} CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
     container:
       # The CKAN version tag of the Solr and Postgres containers should match
       # the one of the container the tests run on.
       # You can switch this base image with a custom image tailored to your project
       image: ckan/ckan-dev:${{ matrix.ckan-version }}
-      options: --user root
     services:
       solr:
         image: ckan/ckan-solr:${{ matrix.ckan-version }}-solr9
@@ -43,7 +32,6 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
           image: redis:3
-
     env:
       CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
       CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@postgres/datastore_test
@@ -53,16 +41,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      continue-on-error: ${{ matrix.experimental }}
     - name: Install requirements
       # Install any extra requirements your extension has here (dev requirements, other extensions etc)
       run: |
-        pip install -e '.[dev]'
+        pip install -e ".[dev]"
     - name: Setup extension
       # Extra initialization steps
       run: |
         # Replace default path to CKAN core config file with the one on the container
         sed -i -e 's/use = config:.*/use = config:\/srv\/app\/src\/ckan\/test-core.ini/' test.ini
     - name: Run tests
-      continue-on-error: ${{ matrix.experimental }}
       run: pytest --ckan-ini=test.ini --cov=ckanext.search_tweaks --disable-warnings ckanext/search_tweaks
